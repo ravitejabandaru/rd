@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant SF as Salesforce
+    participant AUTH as Auth Platform
+    participant API as Downstream API
+
+    SF->>AUTH: Submit signed JWT with `source_role`
+    Note right of AUTH: Extract `source_role` from request token
+    AUTH-->>SF: Return new access token with `role` claim
+    SF->>API: Call API with issued token (includes `role`)
+    API-->>API: Enforce RBAC based on `role` claim
