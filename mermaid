@@ -1,10 +1,20 @@
 sequenceDiagram
+    actor Agent as User (Agent)
     participant SF as Salesforce
-    participant AUTH as Auth Platform
-    participant API as Downstream API
+    participant IDA as IDAnywhere
+    participant FR as iCB ForgeRock
+    participant iCB as iCB Case Manager
+    participant Florence as Florence Case Manager
 
-    SF->>AUTH: Submit signed JWT with `source_role`
-    Note right of AUTH: Extract `source_role` from request token
-    AUTH-->>SF: Return new access token with `role` claim
-    SF->>API: Call API with issued token (includes `role`)
-    API-->>API: Enforce RBAC based on `role` claim
+    Agent->>SF: Login to Salesforce
+    SF->>IDA: SAML Auth Request
+    IDA-->>SF: SAML Assertion
+    SF->>FR: Request Colleague Token (with SAML)
+    FR-->>SF: Return 1hr Colleague Token
+
+    SF->>FR: Token Exchange (Colleague Token + partykey JWT w/ source_role)
+    FR-->>SF: Return On-Behalf-Of Token (incl. role claim)
+
+    SF->>iCB: Send OBO Token
+    iCB->>Florence: Forward Token
+    Florence->>Florence: Enforce RBAC using role from token
