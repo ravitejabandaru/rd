@@ -1,0 +1,79 @@
+Architecture Review Decision Ticket
+Title: Request to Add role Claim to JWT Issued via Token Exchange
+Submitted By: Salesforce Integration Team
+Date: [Insert Date]
+Environment: Dev/UAT (Phase 1), Production (post-approval)
+
+⸻
+
+1. Summary
+
+This decision ticket proposes a controlled enhancement to the JWT issued by the central Auth platform during the token exchange process. Specifically, we request that a new claim role be added to the response token based on information present in the incoming request token sent by Salesforce.
+
+⸻
+
+2. Current State
+	•	Salesforce generates a signed JWT (client assertion)
+	•	Submits the JWT to the Auth platform’s /token endpoint (token exchange)
+	•	Auth platform issues a new JWT (access token) for downstream API consumption
+	•	The current issued token includes standard claims (sub, aud, exp, iat, etc.)
+	•	No role or RBAC-enabling claim is present in the response token
+
+⸻
+
+3. Proposed Enhancement
+	•	Add a new claim role in the issued JWT from the Auth team
+	•	Role can be either:
+	•	Extracted from a known claim in the request token (e.g., source_role), or
+	•	Derived based on client identity or existing policy mapping
+
+Example - Request Token from Salesforce:
+
+{
+  "sub": "user123",
+  "client_id": "salesforce-app",
+  "source_role": "case_manager"
+}
+
+Example - Issued Token from Auth Platform:
+
+{
+  "sub": "user123",
+  "aud": "downstream-api",
+  "role": "case_manager",
+  "exp": 1699999999,
+  "iss": "https://auth.internal/jwt"
+}
+
+
+⸻
+
+4. Security Considerations
+	•	Request token is signed by Salesforce (private key)
+	•	Auth platform performs signature validation and issuer checks
+	•	role value is not blindly passed — subject to validation/mapping
+	•	Final issued token remains signed by Auth team
+	•	Follows existing OIDC trust boundary and token TTL policies
+
+⸻
+
+5. Impact Assessment
+	•	Salesforce: No change to existing request mechanism
+	•	Auth Platform: Minor enhancement to token issuance logic (claim injection)
+	•	Downstream Consumers: Optional usage of role for RBAC
+	•	Backward Compatibility: Maintained — claim is additive, not mandatory
+
+⸻
+
+6. Next Steps & Approval Request
+	•	Seek ARGw approval to proceed with Dev/UAT implementation
+	•	Post-UAT validation, propose phased rollout to production
+	•	Provide documentation and mapping logic to Auth team
+	•	Notify impacted downstream consumers
+
+⸻
+
+7. Decision Required From ARGw
+	•	Approval to add role claim to JWT in token exchange flow
+	•	Confirmation on whether Auth team should extract vs derive role
+	•	Sign-off on Dev/UAT deployment
