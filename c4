@@ -40,3 +40,23 @@ graph TD
     style Egress fill:#ede7f6,stroke:#7e57c2,stroke-width:2px
     style AWS fill:#e0f2f1,stroke:#26a69a,stroke-width:2px
     style RBAC fill:#fce4ec,stroke:#ec407a,stroke-width:2px
+
+============
+
+
+graph TD
+    Agent[Browser Agent]
+    SF[Salesforce Org]
+    IDA[IDAnywhere (SAML IdP)]
+    FR[ForgeRock\nToken Issuer]
+    TMS[ICB TMS\nToken Exchange Engine]
+    FL[Florence\nRBAC Enforcement]
+
+    Agent --> SF
+    SF --> IDA: SAML Auth
+    SF --> FR: Request Colleague Token
+    FR --> SF: Colleague Token
+    SF --> TMS: JWT + Colleague Token
+    TMS --> TMS: Validate JWT\nExtract `role`\nIssue Access Token
+    SF --> FL: Call APIs with Access Token
+    FL --> FL: Use role to enforce RBAC
