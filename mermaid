@@ -1,20 +1,20 @@
 sequenceDiagram
-    actor Agent as User (Agent)
-    participant SF as Salesforce
-    participant IDA as IDAnywhere
-    participant FR as iCB ForgeRock
-    participant iCB as iCB Case Manager
-    participant Florence as Florence Case Manager
+    actor User
+    participant Salesforce
+    participant iCB_CaseManager as iCB Case Manager
+    participant EgressAuthn as Egress Authn/Authz Facade
+    participant AWSSecrets as AWS Secrets Manager
+    participant Florence_CaseManager as Florence Case Manager
 
-    Agent->>SF: Login to Salesforce
-    SF->>IDA: SAML Auth Request
-    IDA-->>SF: SAML Assertion
-    SF->>FR: Request Colleague Token (with SAML)
-    FR-->>SF: Return 1hr Colleague Token
+    User->>Salesforce: Login via SAML
+    Salesforce->>iCB_CaseManager: Send JWT (signed request token)
+    iCB_CaseManager->>iCB_CaseManager: Extract `source_role` from JWT
+    iCB_CaseManager->>EgressAuthn: Request new token with `role` = source_role
+    EgressAuthn->>AWSSecrets: Retrieve signing key
+    AWSSecrets-->>EgressAuthn: Signing key
+    EgressAuthn->>EgressAuthn: Generate JWT with `role` claim
+    EgressAuthn-->>iCB_CaseManager: Return signed token
 
-    SF->>FR: Token Exchange (Colleague Token + partykey JWT w/ source_role)
-    FR-->>SF: Return On-Behalf-Of Token (incl. role claim)
-
-    SF->>iCB: Send OBO Token
-    iCB->>Florence: Forward Token
-    Florence->>Florence: Enforce RBAC using role from token
+    iCB_CaseManager->>Florence_CaseManager: Send extracted `role`
+    Florence_CaseManager->>Florence_CaseManager: Enforce RBAC using role
+    Florence_CaseManager-->>User: Grant or deny access
