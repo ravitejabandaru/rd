@@ -1,0 +1,17 @@
+public with sharing class CallRecordingController {
+    @AuraEnabled(cacheable=false)
+    public static String getCallRecording(String callId) {
+        Http http = new Http();
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:DYN_ICBEdge/crm/V1/calls/' + callId);
+        req.setMethod('GET');
+
+        HttpResponse res = http.send(req);
+        if (res.getStatusCode() == 200) {
+            Blob audioBlob = res.getBodyAsBlob();
+            return EncodingUtil.base64Encode(audioBlob); // Return Base64 string
+        } else {
+            throw new AuraHandledException('Error fetching audio: ' + res.getStatus());
+        }
+    }
+}
