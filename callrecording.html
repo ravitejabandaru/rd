@@ -1,0 +1,10 @@
+<template>
+    <lightning-card title="Call Recording">
+        <template if:true={audioUrl}>
+            <audio controls src={audioUrl}></audio>
+        </template>
+        <template if:false={audioUrl}>
+            <p>Loading recording...</p>
+        </template>
+    </lightning-card>
+</template>
