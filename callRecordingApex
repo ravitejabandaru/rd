@@ -1,17 +1,48 @@
-public with sharing class CallRecordingController {
-    @AuraEnabled(cacheable=false)
-    public static String getCallRecording(String callId) {
-        Http http = new Http();
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint('callout:DYN_ICBEdge/crm/V1/calls/' + callId);
-        req.setMethod('GET');
+@RestResource(urlMapping='/CallRecording/*')
+global with sharing class CallRecordingProxy {
+    @HttpGet
+    global static void getRecording() {
+        RestRequest req = RestContext.request;
+        RestResponse res = RestContext.response;
 
-        HttpResponse res = http.send(req);
-        if (res.getStatusCode() == 200) {
-            Blob audioBlob = res.getBodyAsBlob();
-            return EncodingUtil.base64Encode(audioBlob); // Return Base64 string
-        } else {
-            throw new AuraHandledException('Error fetching audio: ' + res.getStatus());
+        // Extract callId from the request URL
+        String callId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);
+
+        // Prepare callout to external service
+        Http http = new Http();
+        HttpRequest r = new HttpRequest();
+        r.setEndpoint('callout:DYN_ICBEdge/crm/V1/calls/' + callId);
+        r.setMethod('GET');
+
+        // Forward Range header if browser sends it
+        String rangeHeader = req.headers.get('Range');
+        if (rangeHeader != null) {
+            r.setHeader('Range', rangeHeader);
         }
+
+        // Add Authorization header if not using Named Credential
+        // r.setHeader('Authorization', 'Bearer ' + token);
+
+        HttpResponse externalRes = http.send(r);
+
+        // Forward relevant headers
+        if (externalRes.getHeader('Content-Type') != null) {
+            res.addHeader('Content-Type', externalRes.getHeader('Content-Type'));
+        } else {
+            res.addHeader('Content-Type', 'audio/wav'); // fallback
+        }
+
+        if (externalRes.getHeader('Content-Range') != null) {
+            res.addHeader('Content-Range', externalRes.getHeader('Content-Range'));
+        }
+        if (externalRes.getHeader('Accept-Ranges') != null) {
+            res.addHeader('Accept-Ranges', externalRes.getHeader('Accept-Ranges'));
+        }
+
+        // Forward HTTP status code (200 or 206 Partial Content)
+        res.statusCode = externalRes.getStatusCode();
+
+        // Stream chunk back to browser
+        res.responseBody = externalRes.getBodyAsBlob();
     }
 }
