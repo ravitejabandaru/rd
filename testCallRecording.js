@@ -1,30 +1,48 @@
 import { LightningElement, api, track } from 'lwc';
+import getCallRecordingChunk from '@salesforce/apex/CallRecordingController.getCallRecordingChunk';
 
-export default class CallRecordingPlayer extends LightningElement {
+const CHUNK_SIZE = 1024 * 512; // 512 KB per chunk
+
+export default class CallRecordingChunkPlayer extends LightningElement {
     @api callId;
     @track audioUrl;
 
-    connectedCallback() {
-        this.loadRecording();
+    async connectedCallback() {
+        await this.loadChunks();
     }
 
-    async loadRecording() {
+    async loadChunks() {
         try {
-            const response = await fetch(
-                window.location.origin + '/services/apexrest/CallRecording/' + this.callId,
-                { headers: { "Range": "bytes=0-" } } // start from beginning
-            );
+            let start = 0;
+            let chunks = [];
+            const totalSize = 5 * 1024 * 1024; // TODO: replace with actual file size if known
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            while (start < totalSize) {
+                const end = Math.min(start + CHUNK_SIZE - 1, totalSize - 1);
+
+                const base64Chunk = await getCallRecordingChunk({
+                    callId: this.callId,
+                    start: start,
+                    end: end
+                });
+
+                // Convert base64 → bytes
+                const byteChars = atob(base64Chunk);
+                const byteNumbers = new Array(byteChars.length);
+                for (let i = 0; i < byteChars.length; i++) {
+                    byteNumbers[i] = byteChars.charCodeAt(i);
+                }
+                chunks.push(new Uint8Array(byteNumbers));
+
+                start += CHUNK_SIZE;
             }
 
-            const blob = await response.blob();
-
-            // Create a browser-safe URL
+            // Combine all chunks into one Blob
+            const blob = new Blob(chunks, { type: 'audio/wav' });
             this.audioUrl = URL.createObjectURL(blob);
+
         } catch (e) {
-            console.error("Error fetching recording", e);
+            console.error('Error loading audio chunks:', e);
         }
     }
 }
