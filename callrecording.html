@@ -1,10 +1,35 @@
 <template>
     <lightning-card title="Call Recording">
-        <template if:true={audioUrl}>
-            <audio controls src={audioUrl}></audio>
-        </template>
-        <template if:false={audioUrl}>
-            <p>Loading recording...</p>
-        </template>
+        <div class="slds-p-around_medium">
+
+            <audio src={audioUrl} 
+                   ontimeupdate={updateTime} 
+                   onloadedmetadata={loadMetadata}
+                   ref={audio}></audio>
+
+            <!-- Progress bar with hover time -->
+            <div class="slider-container" onmousemove={showHoverTime} onmouseleave={hideHoverTime}>
+                <input type="range" id="progressBar"
+                       value={currentTime}
+                       min="0"
+                       max={duration}
+                       step="1"
+                       oninput={seekAudio} />
+                <div if:true={hoverTimeVisible} class="hover-time" style={hoverStyle}>
+                    {formattedHoverTime}
+                </div>
+            </div>
+
+            <!-- Current time / Duration -->
+            <div class="slds-grid slds-grid_align-spread slds-m-top_small">
+                <span>{formattedCurrentTime}</span>
+                <span>{formattedDuration}</span>
+            </div>
+
+            <!-- Play/Pause -->
+            <lightning-button label={isPlaying ? "Pause" : "Play"}
+                              onclick={togglePlay}>
+            </lightning-button>
+        </div>
     </lightning-card>
 </template>
