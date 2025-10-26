@@ -1,48 +1,75 @@
-import { LightningElement, api, track } from 'lwc';
-import getCallRecordingChunk from '@salesforce/apex/CallRecordingController.getCallRecordingChunk';
+import { LightningElement, track } from 'lwc';
 
-const CHUNK_SIZE = 1024 * 512; // 512 KB per chunk
+export default class AudioPlayer extends LightningElement {
+    audio;
+    audioUrl = 'https://example.com/call.mp3';
 
-export default class CallRecordingChunkPlayer extends LightningElement {
-    @api callId;
-    @track audioUrl;
+    @track currentTime = 0;
+    @track duration = 0;
+    @track isPlaying = false;
 
-    async connectedCallback() {
-        await this.loadChunks();
+    @track hoverTimeVisible = false;
+    @track hoverTime = 0;
+    @track hoverStyle = '';
+
+    renderedCallback() {
+        if (!this.audio) {
+            this.audio = this.template.querySelector('audio');
+        }
     }
 
-    async loadChunks() {
-        try {
-            let start = 0;
-            let chunks = [];
-            const totalSize = 5 * 1024 * 1024; // TODO: replace with actual file size if known
+    loadMetadata = () => {
+        this.duration = Math.floor(this.audio.duration);
+    };
 
-            while (start < totalSize) {
-                const end = Math.min(start + CHUNK_SIZE - 1, totalSize - 1);
+    updateTime = () => {
+        this.currentTime = Math.floor(this.audio.currentTime);
+    };
 
-                const base64Chunk = await getCallRecordingChunk({
-                    callId: this.callId,
-                    start: start,
-                    end: end
-                });
+    seekAudio(event) {
+        this.audio.currentTime = event.target.value;
+        this.currentTime = event.target.value;
+    }
 
-                // Convert base64 → bytes
-                const byteChars = atob(base64Chunk);
-                const byteNumbers = new Array(byteChars.length);
-                for (let i = 0; i < byteChars.length; i++) {
-                    byteNumbers[i] = byteChars.charCodeAt(i);
-                }
-                chunks.push(new Uint8Array(byteNumbers));
-
-                start += CHUNK_SIZE;
-            }
-
-            // Combine all chunks into one Blob
-            const blob = new Blob(chunks, { type: 'audio/wav' });
-            this.audioUrl = URL.createObjectURL(blob);
-
-        } catch (e) {
-            console.error('Error loading audio chunks:', e);
+    togglePlay = () => {
+        if (this.isPlaying) {
+            this.audio.pause();
+        } else {
+            this.audio.play();
         }
+        this.isPlaying = !this.isPlaying;
+    };
+
+    // Format mm:ss
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+        return `${mins}:${secs}`;
+    }
+
+    get formattedCurrentTime() {
+        return this.formatTime(this.currentTime);
+    }
+    get formattedDuration() {
+        return this.formatTime(this.duration);
+    }
+    get formattedHoverTime() {
+        return this.formatTime(this.hoverTime);
+    }
+
+    // Show hover preview
+    showHoverTime(event) {
+        const slider = this.template.querySelector('#progressBar');
+        const rect = slider.getBoundingClientRect();
+        const percent = (event.clientX - rect.left) / rect.width;
+        const seconds = Math.floor(this.duration * percent);
+        this.hoverTime = Math.min(Math.max(seconds, 0), this.duration);
+        this.hoverTimeVisible = true;
+
+        this.hoverStyle = `left:${event.clientX - rect.left}px;`;
+    }
+
+    hideHoverTime() {
+        this.hoverTimeVisible = false;
     }
 }
