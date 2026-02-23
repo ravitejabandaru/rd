@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DevX & Automation Team – Challenges & Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Charlie+Display:wght@400;600;700&family=Charlie+Text:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  /* ── Confluence-faithful tokens ── */
+  :root {
+    --cf-bg:         #FFFFFF;
+    --cf-surface:    #F7F8F9;
+    --cf-border:     #DCDFE4;
+    --cf-text:       #172B4D;
+    --cf-muted:      #626F86;
+    --cf-link:       #0C66E4;
+    --cf-teal:       #0055CC;
+    --cf-teal-light: #E9F2FF;
+    --cf-green:      #1F845A;
+    --cf-green-bg:   #DCFFF1;
+    --cf-orange:     #A54800;
+    --cf-orange-bg:  #FFF3EB;
+    --cf-red:        #AE2A19;
+    --cf-red-bg:     #FFECEB;
+    --cf-yellow:     #7F5F01;
+    --cf-yellow-bg:  #FFF7D6;
+    --cf-purple:     #5E4DB2;
+    --cf-purple-bg:  #F3F0FF;
+    --radius:        4px;
+    --font-display:  'Charlie Display', 'Segoe UI', system-ui, sans-serif;
+    --font-body:     'Charlie Text', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--cf-text);
+    background: var(--cf-bg);
+  }
+
+  /* ── Confluence chrome ── */
+  .cf-topbar {
+    height: 56px;
+    background: #1868DB;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 0 rgba(0,0,0,.2);
+  }
+  .cf-topbar-logo {
+    width: 28px; height: 28px;
+    background: white;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #1868DB; letter-spacing: -1px;
+  }
+  .cf-topbar-breadcrumb {
+    color: rgba(255,255,255,.75);
+    font-size: 13px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cf-topbar-breadcrumb span { color: white; font-weight: 600; }
+  .cf-topbar-breadcrumb .sep { opacity: .5; }
+  .cf-topbar-actions {
+    margin-left: auto;
+    display: flex; gap: 8px;
+  }
+  .cf-topbar-btn {
+    height: 32px; padding: 0 14px;
+    border-radius: 3px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; font-family: var(--font-body);
+  }
+  .cf-topbar-btn.primary { background: white; color: #1868DB; }
+  .cf-topbar-btn.ghost   { background: rgba(255,255,255,.15); color: white; }
+
+  /* ── Layout ── */
+  .cf-layout {
+    display: flex;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── Sidebar (TOC) ── */
+  .cf-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    padding: 32px 16px 32px 0;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+  .cf-toc-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--cf-muted);
+    margin-bottom: 10px; padding: 0 8px;
+  }
+  .cf-toc-item {
+    display: block; padding: 5px 8px;
+    border-radius: var(--radius); color: var(--cf-muted);
+    text-decoration: none; font-size: 13px;
+    transition: background .12s, color .12s;
+    border-left: 2px solid transparent;
+  }
+  .cf-toc-item:hover { background: var(--cf-surface); color: var(--cf-text); }
+  .cf-toc-item.active { color: var(--cf-link); border-left-color: var(--cf-link); background: var(--cf-teal-light); }
+  .cf-toc-sub { padding-left: 20px; }
+
+  /* ── Main content ── */
+  .cf-main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px 0 80px 40px;
+    border-left: 1px solid var(--cf-border);
+  }
+
+  /* Page title block */
+  .cf-page-title {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700;
+    color: var(--cf-text);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .cf-page-meta {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .cf-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #1868DB; color: white;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cf-meta-item { font-size: 12px; color: var(--cf-muted); display: flex; align-items: center; gap: 6px; }
+  .cf-meta-item strong { color: var(--cf-text); }
+
+  .cf-label {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 3px;
+    font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .cf-label.blue   { background: var(--cf-teal-light); color: var(--cf-teal); }
+  .cf-label.green  { background: var(--cf-green-bg);   color: var(--cf-green); }
+  .cf-label.red    { background: var(--cf-red-bg);     color: var(--cf-red); }
+  .cf-label.orange { background: var(--cf-orange-bg);  color: var(--cf-orange); }
+  .cf-label.yellow { background: var(--cf-yellow-bg);  color: var(--cf-yellow); }
+  .cf-label.purple { background: var(--cf-purple-bg);  color: var(--cf-purple); }
+
+  /* Divider */
+  .cf-divider { border: none; border-top: 1px solid var(--cf-border); margin: 28px 0; }
+
+  /* Headings */
+  h1.cf-h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin: 36px 0 12px; color: var(--cf-text); }
+  h2.cf-h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 28px 0 10px; color: var(--cf-text); }
+  h3.cf-h3 { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--cf-text); }
+  p { margin-bottom: 12px; color: var(--cf-text); }
+
+  /* Info panels */
+  .cf-panel {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin: 16px 0;
+    display: flex; gap: 12px;
+    border-left: 4px solid;
+  }
+  .cf-panel-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .cf-panel-body { flex: 1; }
+  .cf-panel-body p:last-child { margin-bottom: 0; }
+  .cf-panel.info    { background: var(--cf-teal-light);  border-color: #0C66E4; }
+  .cf-panel.success { background: var(--cf-green-bg);    border-color: #1F845A; }
+  .cf-panel.warning { background: var(--cf-yellow-bg);   border-color: #CF9F02; }
+  .cf-panel.error   { background: var(--cf-red-bg);      border-color: #CA3521; }
+  .cf-panel.note    { background: var(--cf-orange-bg);   border-color: #C25100; }
+  .cf-panel strong  { font-weight: 700; display: block; margin-bottom: 4px; }
+
+  /* Tables */
+  .cf-table-wrap { overflow-x: auto; margin: 16px 0; }
+  table.cf-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.cf-table th {
+    background: var(--cf-surface); text-align: left;
+    padding: 8px 12px; font-weight: 600; font-size: 12px;
+    border: 1px solid var(--cf-border); color: var(--cf-text);
+    white-space: nowrap;
+  }
+  table.cf-table td {
+    padding: 8px 12px; border: 1px solid var(--cf-border);
+    vertical-align: top; color: var(--cf-text);
+  }
+  table.cf-table tr:nth-child(even) td { background: #FAFBFC; }
+  table.cf-table tr:hover td { background: var(--cf-teal-light); }
+
+  /* Code */
+  code.cf-inline {
+    background: var(--cf-surface); border: 1px solid var(--cf-border);
+    border-radius: 3px; padding: 1px 5px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 12px; color: var(--cf-red);
+  }
+  pre.cf-code {
+    background: #1E2431; border-radius: var(--radius);
+    padding: 16px; overflow-x: auto; margin: 12px 0;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 12px; line-height: 1.65; color: #CDD6F4;
+  }
+  pre.cf-code .kw  { color: #89B4FA; }
+  pre.cf-code .str { color: #A6E3A1; }
+  pre.cf-code .cmt { color: #6C7086; font-style: italic; }
+  pre.cf-code .fn  { color: #CBA6F7; }
+
+  /* Status lozenges */
+  .cf-status {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 3px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  }
+  .cf-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .cf-status.todo      { background: var(--cf-surface); color: var(--cf-muted); }
+  .cf-status.in-prog   { background: var(--cf-teal-light); color: var(--cf-teal); }
+  .cf-status.urgent    { background: var(--cf-red-bg); color: var(--cf-red); }
+  .cf-status.done      { background: var(--cf-green-bg); color: var(--cf-green); }
+  .cf-status.review    { background: var(--cf-yellow-bg); color: var(--cf-yellow); }
+
+  /* Columns macro */
+  .cf-columns { display: grid; gap: 20px; margin: 16px 0; }
+  .cf-columns.col-2 { grid-template-columns: 1fr 1fr; }
+  .cf-columns.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cf-col-card {
+    border: 1px solid var(--cf-border); border-radius: var(--radius);
+    padding: 16px; background: var(--cf-bg);
+  }
+  .cf-col-card h4 {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 2px solid; display: flex; align-items: center; gap: 8px;
+  }
+  .cf-col-card.red    h4 { border-color: #CA3521; color: #CA3521; }
+  .cf-col-card.green  h4 { border-color: #1F845A; color: #1F845A; }
+  .cf-col-card.blue   h4 { border-color: #0C66E4; color: #0C66E4; }
+  .cf-col-card.orange h4 { border-color: #C25100; color: #C25100; }
+  .cf-col-card.teal   h4 { border-color: #0055CC; color: #0055CC; }
+  .cf-col-card.grey   h4 { border-color: #626F86; color: #626F86; }
+  .cf-col-card ul { padding-left: 18px; }
+  .cf-col-card li { margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
+
+  /* Decision table */
+  .decision-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 700;
+  }
+  .decision-badge.recommended { background: var(--cf-green-bg); color: var(--cf-green); }
+  .decision-badge.not-rec     { background: var(--cf-red-bg);   color: var(--cf-red); }
+
+  /* Expand/accordion section */
+  details.cf-expand {
+    border: 1px solid var(--cf-border); border-radius: var(--radius);
+    margin: 10px 0;
+  }
+  details.cf-expand summary {
+    padding: 10px 14px; cursor: pointer; font-weight: 600; font-size: 13px;
+    background: var(--cf-surface); border-radius: var(--radius);
+    list-style: none; display: flex; align-items: center; gap: 8px;
+  }
+  details.cf-expand summary::before { content: '▶'; font-size: 10px; transition: transform .2s; }
+  details.cf-expand[open] summary::before { transform: rotate(90deg); }
+  details.cf-expand > div { padding: 14px; }
+
+  /* Phase timeline */
+  .cf-timeline { margin: 16px 0; }
+  .cf-phase {
+    display: flex; gap: 16px; margin-bottom: 0;
+    position: relative;
+  }
+  .cf-phase-line {
+    display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+  }
+  .cf-phase-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .cf-phase-connector {
+    width: 2px; background: var(--cf-border); flex: 1; min-height: 16px;
+    margin: 2px 0;
+  }
+  .cf-phase-content { padding-bottom: 20px; flex: 1; }
+  .cf-phase-content h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; margin-top: 5px; }
+  .cf-phase-content ul { padding-left: 18px; }
+  .cf-phase-content li { font-size: 13px; margin-bottom: 4px; }
+
+  ul.cf-ul { padding-left: 20px; margin: 8px 0 12px; }
+  ul.cf-ul li { margin-bottom: 5px; font-size: 13px; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .cf-sidebar { display: none; }
+    .cf-main { border-left: none; padding-left: 0; }
+    .cf-columns.col-2, .cf-columns.col-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Confluence top bar -->
+<div class="cf-topbar">
+  <div class="cf-topbar-logo">C</div>
+  <div class="cf-topbar-breadcrumb">
+    Engineering &nbsp;<span class="sep">/</span>&nbsp;
+    DevX &amp; Automation &nbsp;<span class="sep">/</span>&nbsp;
+    <span>Team Charter &amp; Challenges</span>
+  </div>
+  <div class="cf-topbar-actions">
+    <button class="cf-topbar-btn ghost">Share</button>
+    <button class="cf-topbar-btn primary">Edit</button>
+  </div>
+</div>
+
+<div class="cf-layout">
+
+  <!-- Sidebar TOC -->
+  <nav class="cf-sidebar">
+    <div class="cf-toc-title">On this page</div>
+    <a href="#overview"    class="cf-toc-item active">Overview</a>
+    <a href="#challenge-1a" class="cf-toc-item cf-toc-sub">1A · Salesforce UI Testing</a>
+    <a href="#challenge-1b" class="cf-toc-item cf-toc-sub">1B · Salesforce API Testing</a>
+    <a href="#challenge-2"  class="cf-toc-item cf-toc-sub">2 · Amazon Connect Voice</a>
+    <a href="#challenge-3"  class="cf-toc-item cf-toc-sub">3 · AWS Repo &amp; CI/CD</a>
+    <a href="#resources"   class="cf-toc-item">Resource Planning</a>
+    <a href="#toolchain"   class="cf-toc-item">Toolchain</a>
+    <a href="#decisions"   class="cf-toc-item">Decision Log</a>
+  </nav>
+
+  <!-- Main content -->
+  <main class="cf-main">
+
+    <!-- Page title -->
+    <h1 class="cf-page-title">DevX &amp; Automation Team — Challenges, Solutions &amp; Resources</h1>
+
+    <div class="cf-page-meta">
+      <div class="cf-meta-item">
+        <div class="cf-avatar">TL</div>
+        <span>Created by <strong>Team Lead</strong></span>
+      </div>
+      <div class="cf-meta-item">📅 <strong>2025</strong></div>
+      <div class="cf-meta-item">🔄 <strong>In Progress</strong></div>
+      <span class="cf-label blue">DevX</span>
+      <span class="cf-label orange">Salesforce</span>
+      <span class="cf-label purple">Amazon Connect</span>
+      <span class="cf-label red">AWS</span>
+    </div>
+
+    <hr class="cf-divider"/>
+
+    <!-- Overview -->
+    <section id="overview">
+      <h1 class="cf-h1">Overview</h1>
+
+      <p>This page documents the DevX &amp; Automation team's mandate, current challenges, proposed solutions, and the resources required to deliver them. It is the single source of truth for the team's goals and will be updated as work progresses.</p>
+
+      <div class="cf-panel info">
+        <div class="cf-panel-icon">🎯</div>
+        <div class="cf-panel-body">
+          <strong>Team Mission</strong>
+          Enable every engineering team to ship faster and safer by providing developer experience tooling across Salesforce, AWS, and Amazon Connect — with a focus on test automation, CI/CD governance, and pipeline reliability.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Challenge Summary</h2>
+
+      <div class="cf-table-wrap">
+        <table class="cf-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Area</th>
+              <th>Challenge</th>
+              <th>Priority</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>3</td>
+              <td>AWS EKS</td>
+              <td>Orchestration service has no repo, no Terraform, no pipeline — unrecoverable if deleted</td>
+              <td><span class="cf-label red">P0 — Urgent</span></td>
+              <td><span class="cf-status urgent">Urgent</span></td>
+            </tr>
+            <tr>
+              <td>1A</td>
+              <td>Salesforce</td>
+              <td>Playwright tests exist but engineers don't write tests for new features they develop</td>
+              <td><span class="cf-label orange">High</span></td>
+              <td><span class="cf-status todo">Not Started</span></td>
+            </tr>
+            <tr>
+              <td>1B</td>
+              <td>Salesforce</td>
+              <td>No Apex API endpoint test framework — critical since bank data lives in external systems</td>
+              <td><span class="cf-label orange">High</span></td>
+              <td><span class="cf-status todo">Not Started</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Amazon Connect</td>
+              <td>No regression automation for voice flows. Evaluating AWS native test framework vs Zoom/Playwright</td>
+              <td><span class="cf-label yellow">Medium</span></td>
+              <td><span class="cf-status todo">Not Started</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Challenge 1A -->
+    <section id="challenge-1a">
+      <h1 class="cf-h1">Challenge 1A — Salesforce UI Regression Testing (Playwright)</h1>
+
+      <h2 class="cf-h2">Context</h2>
+      <p>A Playwright test suite already exists for Salesforce UI flows. However, engineers are not writing tests for the features they develop. As a result, the test suite grows stale — it tests yesterday's features but misses everything new shipping to production.</p>
+
+      <div class="cf-panel warning">
+        <div class="cf-panel-icon">⚠️</div>
+        <div class="cf-panel-body">
+          <strong>Root cause is friction, not intent</strong>
+          Engineers aren't skipping tests maliciously — writing them is just slower than shipping. The solution is to make test authoring faster and easier than skipping it, then enforce it at the PR gate.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Current Pain Points</h2>
+      <ul class="cf-ul">
+        <li>No shared page-object library — every test re-invents selectors</li>
+        <li>No <code class="cf-inline">data-testid</code> standards, so selectors break on CSS/structure changes</li>
+        <li>No PR gate in CloudBees Jenkins — untested code merges freely</li>
+        <li>Flaky tests caused by unstable selectors erode team trust in the suite</li>
+        <li>High manual regression effort per sprint</li>
+      </ul>
+
+      <h2 class="cf-h2">Proposed Solution</h2>
+
+      <div class="cf-columns col-2">
+        <div class="cf-col-card blue">
+          <h4>🏗️ Playwright Scaffold CLI</h4>
+          <ul>
+            <li>CLI tool: <code class="cf-inline">npx devx generate-test MyComponent</code></li>
+            <li>Auto-generates a test stub with the right imports, describe blocks, and <code class="cf-inline">beforeEach</code> setup</li>
+            <li>Engineer fills in the assertions — all boilerplate is done</li>
+            <li>VS Code extension version: right-click a component → Generate Test</li>
+          </ul>
+        </div>
+        <div class="cf-col-card teal">
+          <h4>📚 Shared Page-Object Library</h4>
+          <ul>
+            <li>Central <code class="cf-inline">@devx/sf-pages</code> package with page objects for all major SF pages</li>
+            <li>Enforced <code class="cf-inline">data-testid</code> selector strategy via ESLint rule</li>
+            <li>Any test that uses raw CSS selectors fails lint</li>
+            <li>Reduces test brittleness by decoupling selectors from test logic</li>
+          </ul>
+        </div>
+        <div class="cf-col-card orange">
+          <h4>🔒 CloudBees Jenkins PR Gate</h4>
+          <ul>
+            <li>Pipeline stage: run Playwright tests on every PR</li>
+            <li>Block merge if overall coverage delta is negative</li>
+            <li>Publish HTML test report as a build artifact per run</li>
+            <li>Fail the PR if <code class="cf-inline">data-testid</code> lint violations found</li>
+          </ul>
+        </div>
+        <div class="cf-col-card green">
+          <h4>🤖 AI-Assisted Test Authoring</h4>
+          <ul>
+            <li>Standardised VS Code Copilot prompts for common Salesforce UI patterns</li>
+            <li>Claude Sonnet 4 / GPT-4.1 generate assertions from component description</li>
+            <li>Cuts test authoring time from ~2 hours to ~20 minutes</li>
+            <li>Prompt library stored in team repo — shared and versioned</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cf-panel success">
+        <div class="cf-panel-icon">✅</div>
+        <div class="cf-panel-body">
+          <strong>Definition of Done</strong>
+          Scaffold CLI published. Shared page-object library covers 80% of SF pages. PR gate live in CloudBees Jenkins. New feature PRs blocked if no test added.
+        </div>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Challenge 1B -->
+    <section id="challenge-1b">
+      <h1 class="cf-h1">Challenge 1B — Salesforce API Endpoint Testing (Apex Framework)</h1>
+
+      <h2 class="cf-h2">Why This Matters</h2>
+
+      <div class="cf-panel error">
+        <div class="cf-panel-icon">🏦</div>
+        <div class="cf-panel-body">
+          <strong>Banking context — data lives outside Salesforce</strong>
+          As a bank, most customer and financial data is <em>not</em> stored in Salesforce. It is fetched from and written to external systems via API endpoints. Salesforce is the interface layer; the endpoints are the data pipeline. A regression in an endpoint can silently serve stale, wrong, or missing data to customers. UI tests cannot catch this — they only validate what's displayed, not whether the underlying data is correct.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Approach — Real E2E Endpoint Testing</h2>
+
+      <p>Tests will run against the actual endpoints in the <strong>E2E environment</strong> — no mock data, no WireMock, no stubs. This is intentional: we need to validate the real integration between Salesforce and the external banking systems, including auth, data shape, and response correctness.</p>
+
+      <div class="cf-panel info">
+        <div class="cf-panel-icon">🔗</div>
+        <div class="cf-panel-body">
+          <strong>Why real endpoints, not mocks</strong>
+          Mocks validate that our code calls the right URL with the right parameters — but they can't tell us if the external system actually returns the right data, if auth tokens are correctly scoped, or if the response schema has drifted. For a bank, those are exactly the failures that matter.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Proposed Apex Test Framework</h2>
+
+      <div class="cf-columns col-3">
+        <div class="cf-col-card blue">
+          <h4>🧱 Base Framework</h4>
+          <ul>
+            <li>Apex base class: handles auth, token management, request construction</li>
+            <li>Assertion helpers: <code class="cf-inline">assertFieldPresent()</code>, <code class="cf-inline">assertSchema()</code>, <code class="cf-inline">assertNonNull()</code></li>
+            <li>Each test extends the base — minimal boilerplate per endpoint</li>
+            <li>Runs in the E2E Salesforce sandbox connected to real external systems</li>
+          </ul>
+        </div>
+        <div class="cf-col-card teal">
+          <h4>📋 Endpoint Registry</h4>
+          <ul>
+            <li>Catalogue of all external endpoints called by Salesforce</li>
+            <li>Each entry: URL pattern, HTTP method, auth type, expected response schema</li>
+            <li>Stored in repo as YAML — versioned and reviewable</li>
+            <li>Coverage report: % of registered endpoints with an active test</li>
+          </ul>
+        </div>
+        <div class="cf-col-card orange">
+          <h4>🧪 Contract Tests</h4>
+          <ul>
+            <li>Don't just assert HTTP 200 — validate response shape and key fields</li>
+            <li>If external system changes its schema, the test fails before it reaches prod</li>
+            <li>Snapshot comparison: compare response shape to the last known-good version</li>
+            <li>Alert on schema drift — even without a code change on our side</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Sample Apex Test Structure</h2>
+
+      <pre class="cf-code"><span class="cmt">// Example: test a customer account data endpoint</span>
+<span class="kw">@isTest</span>
+<span class="kw">public class</span> <span class="fn">CustomerAccountEndpointTest</span> <span class="kw">extends</span> <span class="fn">DevXEndpointBase</span> {
+
+    <span class="kw">@isTest</span>
+    <span class="kw">static void</span> <span class="fn">testGetCustomerAccount_returnsValidSchema</span>() {
+        <span class="cmt">// Arrange: real E2E environment, real auth</span>
+        DevXEndpointBase.setEnvironment(<span class="str">'E2E'</span>);
+
+        <span class="cmt">// Act: call the actual external endpoint</span>
+        HttpResponse res = DevXEndpointBase.get(<span class="str">'/api/v2/customer/accounts/{id}'</span>);
+
+        <span class="cmt">// Assert: validate status, shape, and required fields</span>
+        System.assertEquals(200, res.getStatusCode());
+        assertFieldPresent(res, <span class="str">'accountId'</span>);
+        assertFieldPresent(res, <span class="str">'balance'</span>);
+        assertFieldPresent(res, <span class="str">'status'</span>);
+        assertSchema(res, EndpointRegistry.getSchema(<span class="str">'customer-account-v2'</span>));
+    }
+}</pre>
+
+      <h2 class="cf-h2">Pipeline Integration</h2>
+      <ul class="cf-ul">
+        <li>Apex tests run as a stage in the CloudBees Jenkins pipeline</li>
+        <li>Stage runs against the E2E Salesforce sandbox — real endpoints, real data</li>
+        <li>PR blocked if any endpoint test fails or if a new endpoint is added without a test</li>
+        <li>Coverage report published as a Jenkins artifact and linked from this page</li>
+      </ul>
+
+      <div class="cf-panel success">
+        <div class="cf-panel-icon">✅</div>
+        <div class="cf-panel-body">
+          <strong>Definition of Done</strong>
+          Apex base framework published. Endpoint registry populated. 70%+ of external endpoints have active E2E tests. PR gate blocks merge on new endpoints without tests.
+        </div>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Challenge 2 -->
+    <section id="challenge-2">
+      <h1 class="cf-h1">Challenge 2 — Amazon Connect Voice Regression Automation</h1>
+
+      <h2 class="cf-h2">Goal</h2>
+      <p>Build automated regression testing for Amazon Connect voice flows — covering IVR routing, queue logic, and call handling — so regressions are caught before they reach production.</p>
+
+      <h2 class="cf-h2">Options Evaluated</h2>
+
+      <div class="cf-columns col-2">
+        <div class="cf-col-card grey">
+          <h4>❌ Option A — Zoom + Playwright (Other Team)</h4>
+          <ul>
+            <li>Playwright controls a Zoom softphone in a browser</li>
+            <li>Simulates inbound call via Zoom → Amazon Connect integration</li>
+            <li>Requires Zoom license, SDK, and SIP/PSTN configuration</li>
+            <li>Fragile: depends on Zoom UI changes and 3rd-party API stability</li>
+            <li>High maintenance burden — two moving parts (Zoom + Connect)</li>
+            <li>Harder to integrate cleanly into Harness pipeline</li>
+          </ul>
+        </div>
+        <div class="cf-col-card green">
+          <h4>✅ Option B — AWS Native Connect Test Flows (Our Approach)</h4>
+          <ul>
+            <li>Amazon Connect Test Cases API — launched recently by AWS</li>
+            <li>Simulates inbound calls and chat contacts without real telephony</li>
+            <li>Tests the full IVR decision tree, routing, and queue logic natively</li>
+            <li>Zero external dependency — runs entirely inside our AWS account</li>
+            <li>Clean Harness pipeline integration via AWS SDK / CLI</li>
+            <li>Lower maintenance — AWS owns the test infrastructure</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cf-panel info">
+        <div class="cf-panel-icon">💡</div>
+        <div class="cf-panel-body">
+          <strong>Decision: Go with AWS Native Test Flows</strong>
+          The Zoom approach introduces unnecessary external dependency and complexity. The AWS-native path is simpler, more reliable, and keeps everything within our AWS account boundary — which also simplifies IAM and audit requirements for a bank.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">Delivery Plan</h2>
+
+      <div class="cf-timeline">
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#CA3521">1</div>
+            <div class="cf-phase-connector"></div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Weeks 1–4 · POC</h4>
+            <ul>
+              <li>Explore Amazon Connect Test Cases API — call simulation and chat contact flows</li>
+              <li>Build a single end-to-end voice test: inbound call → IVR → queue → agent routing</li>
+              <li>Validate approach: does it cover our specific Connect configuration?</li>
+              <li>Document findings and share with the other team exploring Zoom/Playwright</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#CF9F02">2</div>
+            <div class="cf-phase-connector"></div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Months 2–3 · Regression Suite</h4>
+            <ul>
+              <li>Map all critical voice flows requiring regression coverage</li>
+              <li>Build test suite covering happy paths, error paths, and edge cases</li>
+              <li>Integrate into Harness pipeline — run on every Connect contact-flow deployment</li>
+              <li>Alert on test failure via team Slack channel</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#1F845A">3</div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Month 4 · Maintenance Baseline</h4>
+            <ul>
+              <li>Coverage dashboard: % of flows with active tests</li>
+              <li>Process: new contact flow PRs require a corresponding test</li>
+              <li>Runbook for adding new test scenarios as flows evolve</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Challenge 3 -->
+    <section id="challenge-3">
+      <h1 class="cf-h1">Challenge 3 — AWS EKS Repo Recovery &amp; CI/CD Bootstrap</h1>
+
+      <div class="cf-panel error">
+        <div class="cf-panel-icon">🚨</div>
+        <div class="cf-panel-body">
+          <strong>P0 — Critical Unrecoverable Risk</strong>
+          The voice and chat orchestration service running on the production EKS cluster has <strong>no source repository, no Terraform, and no deployment pipeline</strong>. If the running pods are deleted, the cluster is terminated, or an engineer accidentally modifies the wrong resource — the service <strong>cannot be recovered</strong>. This must be treated as an active incident-prevention task and started in Week 1.
+        </div>
+      </div>
+
+      <h2 class="cf-h2">What We Know</h2>
+
+      <div class="cf-table-wrap">
+        <table class="cf-table">
+          <thead>
+            <tr><th>Item</th><th>Current State</th><th>Target State</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Source code</td><td>❌ No repo</td><td>✅ GitHub repo with main protection</td></tr>
+            <tr><td>Infrastructure</td><td>❌ No Terraform / IaC</td><td>✅ Terraform modules in repo</td></tr>
+            <tr><td>Container images</td><td>⚠️ Running in cluster, unknown source</td><td>✅ Tagged, pushed to ECR, re-buildable</td></tr>
+            <tr><td>Deployment pipeline</td><td>❌ Manual / none</td><td>✅ Harness pipeline with env promotion</td></tr>
+            <tr><td>Secrets management</td><td>⚠️ Unknown (possibly hardcoded)</td><td>✅ AWS Secrets Manager</td></tr>
+            <tr><td>Rollback</td><td>❌ Not possible</td><td>✅ Harness rollback to previous image tag</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="cf-h2">Delivery Plan</h2>
+
+      <div class="cf-timeline">
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#CA3521">1</div>
+            <div class="cf-phase-connector"></div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Weeks 1–3 · URGENT — Repo Recovery</h4>
+            <ul>
+              <li>Run <code class="cf-inline">kubectl get all -o yaml</code> across all namespaces — export every deployment, service, configmap, ingress to YAML files</li>
+              <li>Identify container images currently running — pull, retag, push to ECR</li>
+              <li>Sanitise all exported configs: remove auto-generated fields, redact secrets</li>
+              <li>Create GitHub repo, commit all manifests, protect <code class="cf-inline">main</code> branch</li>
+              <li><strong>Verification test:</strong> create a staging namespace, redeploy purely from the repo, confirm service starts and passes health checks</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#CF9F02">2</div>
+            <div class="cf-phase-connector"></div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Weeks 4–8 · Terraform &amp; Harness Pipeline</h4>
+            <ul>
+              <li>Write Terraform for EKS cluster, node groups, VPC, IAM roles, and ECR repositories using the <code class="cf-inline">aws_eks_cluster</code> module (well-documented, good starting point)</li>
+              <li>Harness pipeline stages: build image → push to ECR → deploy to staging EKS → approval gate → deploy to prod</li>
+              <li>Add Harness Terraform Plan step — <code class="cf-inline">terraform plan</code> runs as a pipeline stage before any <code class="cf-inline">apply</code>, so changes are reviewed before execution</li>
+              <li>Rollback strategy: Harness one-click rollback to previous image tag</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cf-phase">
+          <div class="cf-phase-line">
+            <div class="cf-phase-dot" style="background:#1F845A">3</div>
+          </div>
+          <div class="cf-phase-content">
+            <h4>Ongoing · Governance</h4>
+            <ul>
+              <li>Harness GitOps: cluster state continuously synced to the GitHub repo — drift triggers an alert</li>
+              <li>Secret rotation via AWS Secrets Manager — no hardcoded credentials in any config</li>
+              <li>Full recovery runbook: step-by-step instructions to rebuild the cluster from zero</li>
+              <li>Quarterly DR drill: actually run the recovery process to verify the runbook stays accurate</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="cf-panel note">
+        <div class="cf-panel-icon">📘</div>
+        <div class="cf-panel-body">
+          <strong>Terraform ramp-up note</strong>
+          The team is not currently experienced with Terraform. Recommended path: start with Phase 1 (kubectl export — no Terraform needed), which removes the existential risk immediately. For Phase 2, use the <code class="cf-inline">terraform-aws-modules/eks/aws</code> community module as a starting point — it is extensively documented and used widely. Recommend engaging an AWS Solutions Architect for a half-day review of the Terraform plan before first apply.
+        </div>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Resource Planning -->
+    <section id="resources">
+      <h1 class="cf-h1">Resource Planning &amp; Timeline</h1>
+
+      <div class="cf-table-wrap">
+        <table class="cf-table">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>Total Timeline</th>
+              <th>Parallel Delivery</th>
+              <th>Risk</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>3 Engineers</strong> <span class="cf-label green">Recommended</span></td>
+              <td>~6 months</td>
+              <td>✅ All challenges in parallel</td>
+              <td><span class="cf-label green">Low</span></td>
+              <td>AWS recovery in week 1–3. SFDC UI scaffold by month 3. Connect POC month 1.5. Full delivery month 6.</td>
+            </tr>
+            <tr>
+              <td><strong>2 Engineers</strong></td>
+              <td>~9 months</td>
+              <td>⚠️ Partial — mostly sequential</td>
+              <td><span class="cf-label yellow">Medium</span></td>
+              <td>Both focus on AWS recovery first. SFDC then Connect sequentialised. Connect work starts month 5+.</td>
+            </tr>
+            <tr>
+              <td><strong>1 Engineer</strong></td>
+              <td>12+ months</td>
+              <td>❌ Fully sequential</td>
+              <td><span class="cf-label red">High</span></td>
+              <td>Single point of failure. No capacity for parallel work. AWS, then SFDC UI, then SFDC API, then Connect.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="cf-expand">
+        <summary>3 Engineers — Detailed Timeline</summary>
+        <div>
+          <ul class="cf-ul">
+            <li><strong>Week 1–3:</strong> All 3 on AWS repo recovery (P0)</li>
+            <li><strong>Month 1–3:</strong> Eng 1 → SFDC UI scaffold + PR gate. Eng 2 → Apex API framework. Eng 3 → Connect voice POC</li>
+            <li><strong>Month 3–4:</strong> SFDC UI done. Eng 1 supports API testing. Connect POC complete, decision made.</li>
+            <li><strong>Month 4–5:</strong> Harness pipeline + Terraform for AWS. SFDC API coverage to 70%.</li>
+            <li><strong>Month 5–6:</strong> Connect regression suite. AWS governance. All documentation.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="cf-expand">
+        <summary>2 Engineers — Detailed Timeline</summary>
+        <div>
+          <ul class="cf-ul">
+            <li><strong>Week 1–3:</strong> Both on AWS repo recovery</li>
+            <li><strong>Month 1–4:</strong> Eng 1 → SFDC UI + API (sequential). Eng 2 → AWS Terraform + Harness pipeline</li>
+            <li><strong>Month 5–9:</strong> Connect voice automation. Both engineers once SFDC done.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Toolchain -->
+    <section id="toolchain">
+      <h1 class="cf-h1">Toolchain</h1>
+
+      <div class="cf-table-wrap">
+        <table class="cf-table">
+          <thead>
+            <tr><th>Tool</th><th>Use</th><th>Challenges</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>GitHub</strong></td>
+              <td>Source control, PR governance, branch protection</td>
+              <td>All (1A, 1B, 2, 3)</td>
+            </tr>
+            <tr>
+              <td><strong>CloudBees Jenkins</strong></td>
+              <td>Salesforce deployments + Playwright/Apex test gates</td>
+              <td>1A, 1B</td>
+            </tr>
+            <tr>
+              <td><strong>Harness</strong></td>
+              <td>AWS CI/CD pipelines, EKS deployment, Terraform plan/apply, GitOps</td>
+              <td>2, 3</td>
+            </tr>
+            <tr>
+              <td><strong>Playwright</strong></td>
+              <td>Salesforce UI regression test framework</td>
+              <td>1A</td>
+            </tr>
+            <tr>
+              <td><strong>Apex (Salesforce)</strong></td>
+              <td>API endpoint test framework running in E2E sandbox</td>
+              <td>1B</td>
+            </tr>
+            <tr>
+              <td><strong>AWS Connect Test Cases API</strong></td>
+              <td>Native voice &amp; chat regression testing for Amazon Connect</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td><strong>Terraform</strong></td>
+              <td>Infrastructure as Code for EKS cluster, VPC, IAM, ECR</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td><strong>VS Code + Copilot</strong></td>
+              <td>AI-assisted test generation (Claude Sonnet 4, GPT-4.1/4o)</td>
+              <td>All</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+
+    <!-- Decision Log -->
+    <section id="decisions">
+      <h1 class="cf-h1">Decision Log</h1>
+
+      <div class="cf-table-wrap">
+        <table class="cf-table">
+          <thead>
+            <tr><th>Date</th><th>Decision</th><th>Rationale</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025</td>
+              <td>Use AWS-native Connect Test Flows over Zoom + Playwright for voice regression</td>
+              <td>Fewer dependencies, no Zoom license needed, cleaner Harness integration, stays within AWS account boundary</td>
+              <td><span class="cf-status done">Decided</span></td>
+            </tr>
+            <tr>
+              <td>2025</td>
+              <td>Run Apex API tests against real E2E endpoints — no mock data</td>
+              <td>Must validate real bank system integrations including auth, schema, and data correctness. Mocks cannot catch external system regressions.</td>
+              <td><span class="cf-status done">Decided</span></td>
+            </tr>
+            <tr>
+              <td>2025</td>
+              <td>Treat AWS EKS repo recovery as P0 — start Week 1 regardless of headcount</td>
+              <td>Running production service with no repo = unrecoverable. Risk is existential and independent of team size.</td>
+              <td><span class="cf-status done">Decided</span></td>
+            </tr>
+            <tr>
+              <td>TBD</td>
+              <td>Headcount: 3 engineers recommended</td>
+              <td>Enables parallel delivery across all challenges in 6 months. 2 = 9 months sequential. 1 = 12+ months with high risk.</td>
+              <td><span class="cf-status review">Pending approval</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="cf-divider"/>
+    <p style="font-size:12px; color:var(--cf-muted); text-align:center; padding-bottom: 20px;">
+      DevX &amp; Automation Team · Last updated 2025 · Questions? Reach out in <strong>#devx-automation</strong>
+    </p>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active TOC item on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const tocItems = document.querySelectorAll('.cf-toc-item');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocItems.forEach(t => t.classList.remove('active'));
+        const active = document.querySelector(`.cf-toc-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
