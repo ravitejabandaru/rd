@@ -1,0 +1,356 @@
+<mxGraphModel>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 1 — C4 LEVEL 1: SYSTEM CONTEXT
+  ═══════════════════════════════════════════════ -->
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ── Title ── -->
+    <mxCell id="title1" value="C4 Model — Level 1: System Context" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+      <mxGeometry x="200" y="20" width="760" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="subtitle1" value="Salesforce Delivery Platform · Current State · Real tool names, no internal URLs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#5e6c84;" vertex="1" parent="1">
+      <mxGeometry x="200" y="58" width="760" height="24" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         PEOPLE
+    ══════════════════════════ -->
+
+    <!-- Developer -->
+    <mxCell id="p1" value="&lt;b&gt;Developer&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[Person]&lt;br&gt;Writes Salesforce code in&lt;br&gt;a personal dev sandbox&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=12;align=center;" vertex="1" parent="1">
+      <mxGeometry x="60" y="200" width="160" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- QA Engineer -->
+    <mxCell id="p2" value="&lt;b&gt;QA Engineer&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[Person]&lt;br&gt;Executes testing in E2E&lt;br&gt;and NFT environments&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=12;align=center;" vertex="1" parent="1">
+      <mxGeometry x="60" y="440" width="160" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- Release Manager -->
+    <mxCell id="p3" value="&lt;b&gt;Release Manager&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[Person]&lt;br&gt;Manages change approval,&lt;br&gt;deployment coordination&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=12;align=center;" vertex="1" parent="1">
+      <mxGeometry x="60" y="680" width="160" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         MAIN SYSTEM (in scope)
+    ══════════════════════════ -->
+    <mxCell id="sys_main" value="&lt;b&gt;Salesforce Delivery Platform&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:11px'&gt;[Software System — In Scope]&lt;br&gt;&lt;br&gt;Manages the full lifecycle of&lt;br&gt;Salesforce code: build, test,&lt;br&gt;release, and deploy to production&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=13;arcSize=5;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="460" y="330" width="240" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         EXTERNAL SYSTEMS
+    ══════════════════════════ -->
+
+    <!-- GitHub -->
+    <mxCell id="ext1" value="&lt;b&gt;GitHub&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Source control for all&lt;br&gt;Salesforce metadata and&lt;br&gt;pipeline configuration&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="820" y="120" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- Jenkins / Cloudbees -->
+    <mxCell id="ext2" value="&lt;b&gt;Jenkins / Cloudbees&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;CI/CD orchestration platform.&lt;br&gt;Triggered by GitHub webhooks&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="820" y="300" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- Salesforce -->
+    <mxCell id="ext3" value="&lt;b&gt;Salesforce&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Target platform. Hosts all&lt;br&gt;sandboxes and the production&lt;br&gt;Salesforce org&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="820" y="480" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- ServiceNow -->
+    <mxCell id="ext4" value="&lt;b&gt;ServiceNow&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;ITSM platform. Receives&lt;br&gt;auto-generated Change&lt;br&gt;Requests from the pipeline&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="460" y="600" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- SonarQube -->
+    <mxCell id="ext5" value="&lt;b&gt;SonarQube&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Static code analysis and&lt;br&gt;coverage reporting for&lt;br&gt;Apex and Jest&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="270" y="120" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- JET -->
+    <mxCell id="ext6" value="&lt;b&gt;JET&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Test evidence platform.&lt;br&gt;Stores all test results&lt;br&gt;per deployment&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="270" y="600" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- JIRA -->
+    <mxCell id="ext7" value="&lt;b&gt;JIRA&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Test case management&lt;br&gt;and manual regression&lt;br&gt;traceability&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="820" y="660" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- Artifactory -->
+    <mxCell id="ext8" value="&lt;b&gt;Artifactory&lt;/b&gt;&lt;br&gt;&lt;font color='#5e6c84' style='font-size:11px'&gt;[External System]&lt;br&gt;Stores and versions Docker&lt;br&gt;image artifacts for the&lt;br&gt;SFDX CLI container&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=12;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="270" y="380" width="180" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         RELATIONSHIPS — People → Main System
+    ══════════════════════════ -->
+    <mxCell id="r1" value="Raises Pull Request,&lt;br&gt;reviews CI results" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="p1" target="sys_main" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r2" value="Runs test suites,&lt;br&gt;signs off exit report" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="p2" target="sys_main" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r3" value="Approves change requests,&lt;br&gt;coordinates deployments" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="p3" target="sys_main" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         RELATIONSHIPS — Main System → External
+    ══════════════════════════ -->
+    <mxCell id="r4" value="Reads source code,&lt;br&gt;webhook triggers pipeline" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r5" value="Triggers CI/CD jobs&lt;br&gt;via webhook events" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r6" value="Deploys metadata to&lt;br&gt;sandboxes and production" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext3" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r7" value="Auto-creates Change&lt;br&gt;Requests on deployment" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r8" value="Uploads code coverage&lt;br&gt;and quality results" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext5" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r9" value="Stores test evidence&lt;br&gt;for every release" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext6" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r10" value="Links test results to&lt;br&gt;JIRA test cases" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext7" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="r11" value="Pulls versioned Docker&lt;br&gt;image for CI runs" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" edge="1" source="sys_main" target="ext8" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Legend L1 -->
+    <mxCell id="leg1_title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+      <mxGeometry x="60" y="900" width="100" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="leg1_person" value="Person (User role)" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=10;align=center;" vertex="1" parent="1">
+      <mxGeometry x="60" y="930" width="80" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="leg1_sys" value="System in scope" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=10;arcSize=5;" vertex="1" parent="1">
+      <mxGeometry x="180" y="942" width="130" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="leg1_ext" value="External system" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=10;arcSize=5;" vertex="1" parent="1">
+      <mxGeometry x="340" y="942" width="130" height="40" as="geometry" />
+    </mxCell>
+
+  </root>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 2 — C4 LEVEL 2: CONTAINER DIAGRAM
+  ═══════════════════════════════════════════════ -->
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Title -->
+    <mxCell id="t2" value="C4 Model — Level 2: Container Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+      <mxGeometry x="160" y="20" width="860" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="st2" value="Salesforce Delivery Platform — internal containers and their interactions · Real tool names, no internal URLs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#5e6c84;" vertex="1" parent="1">
+      <mxGeometry x="160" y="58" width="860" height="24" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         SYSTEM BOUNDARY BOX
+    ══════════════════════════ -->
+    <mxCell id="boundary" value="Salesforce Delivery Platform [System Boundary]" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.lean_mapping.electronic_info_flow_edge;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#1168bd;strokeWidth=2;fontSize=13;fontStyle=1;fontColor=#1168bd;verticalAlign=top;dashed=1;dashPattern=8 4;" vertex="1" parent="1">
+      <mxGeometry x="200" y="100" width="900" height="720" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         EXTERNAL PEOPLE (outside boundary)
+    ══════════════════════════ -->
+    <mxCell id="c2_dev" value="&lt;b&gt;Developer&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Person]&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=11;align=center;" vertex="1" parent="1">
+      <mxGeometry x="30" y="200" width="120" height="110" as="geometry" />
+    </mxCell>
+    <mxCell id="c2_qa" value="&lt;b&gt;QA Engineer&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Person]&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=11;align=center;" vertex="1" parent="1">
+      <mxGeometry x="30" y="450" width="120" height="110" as="geometry" />
+    </mxCell>
+    <mxCell id="c2_rm" value="&lt;b&gt;Release&lt;br&gt;Manager&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Person]&lt;/font&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=11;align=center;" vertex="1" parent="1">
+      <mxGeometry x="30" y="680" width="120" height="110" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         CONTAINERS (inside boundary)
+    ══════════════════════════ -->
+
+    <!-- GitHub -->
+    <mxCell id="c_github" value="&lt;b&gt;GitHub&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Source Control]&lt;br&gt;&lt;br&gt;Stores Salesforce metadata,&lt;br&gt;Jenkinsfile, and pipeline config.&lt;br&gt;Migrated from Bitbucket.&lt;br&gt;Webhooks trigger Jenkins on&lt;br&gt;PR Open and PR Merge.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="250" y="140" width="200" height="170" as="geometry" />
+    </mxCell>
+
+    <!-- Shared Library -->
+    <mxCell id="c_sharedlib" value="&lt;b&gt;Dynamo Shared Library&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Pipeline Library]&lt;br&gt;&lt;br&gt;Reusable Jenkins pipeline&lt;br&gt;functions for SFDX, SSAP,&lt;br&gt;and Sonar. References the&lt;br&gt;Docker image version via&lt;br&gt;sfdx-app.yaml.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="530" y="140" width="200" height="170" as="geometry" />
+    </mxCell>
+
+    <!-- Jenkins/Cloudbees -->
+    <mxCell id="c_jenkins" value="&lt;b&gt;Jenkins / Cloudbees&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: CI/CD Orchestrator]&lt;br&gt;&lt;br&gt;Receives webhook events from&lt;br&gt;GitHub. Executes the Jenkinsfile.&lt;br&gt;Spins up Docker container for&lt;br&gt;each pipeline run. Routes results&lt;br&gt;back to GitHub PR status.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="810" y="140" width="210" height="170" as="geometry" />
+    </mxCell>
+
+    <!-- Docker SFDX Container -->
+    <mxCell id="c_docker" value="&lt;b&gt;Docker Container (SFDX CLI)&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Build Environment]&lt;br&gt;&lt;br&gt;Lightweight portable container&lt;br&gt;with SFDX CLI, plugins, proxy&lt;br&gt;config and Git pre-installed.&lt;br&gt;Image versioned in Artifactory.&lt;br&gt;Authenticates to Salesforce orgs.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="810" y="390" width="210" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- CI Quality Gates -->
+    <mxCell id="c_gates" value="&lt;b&gt;CI Quality Gates&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Validation Layer]&lt;br&gt;&lt;br&gt;• Apex Tests (≥75% coverage)&lt;br&gt;• Jest Tests (LWC)&lt;br&gt;• Salesforce Validation&lt;br&gt;• SSAP Security Scan&lt;br&gt;• SonarQube Upload&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="530" y="390" width="210" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- Salesforce Sandbox Environments -->
+    <mxCell id="c_sandboxes" value="&lt;b&gt;Salesforce Sandboxes&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Target Environments]&lt;br&gt;&lt;br&gt;Dev Orgs — per developer&lt;br&gt;INT — continuous integration&lt;br&gt;E2E — sprint-end testing&lt;br&gt;NFT — non-functional testing&lt;br&gt;Prod — live production org&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="250" y="390" width="210" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- Release Management -->
+    <mxCell id="c_release" value="&lt;b&gt;Release Management&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Release Process]&lt;br&gt;&lt;br&gt;Sprint-based branch cuts from&lt;br&gt;Dev trunk. Release branch&lt;br&gt;promotes E2E → NFT → Prod.&lt;br&gt;Test Exit Report and Release&lt;br&gt;Notes produced per release.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="250" y="650" width="210" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- Change & Governance -->
+    <mxCell id="c_change" value="&lt;b&gt;Change &amp; Governance&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Governance Layer]&lt;br&gt;&lt;br&gt;Auto-creates SNOW Change&lt;br&gt;Request on PR validation.&lt;br&gt;Peer review, CR approval,&lt;br&gt;comms, and post-deploy&lt;br&gt;validation coordinated here.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="530" y="650" width="210" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- Test Evidence -->
+    <mxCell id="c_jet" value="&lt;b&gt;Test Evidence Store (JET)&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[Container: Evidence Platform]&lt;br&gt;&lt;br&gt;Stores all test results per&lt;br&gt;deployment: Apex, Jest,&lt;br&gt;Selenium, Playwright,&lt;br&gt;and JIRA traceability data.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;arcSize=5;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="810" y="650" width="210" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         EXTERNAL SYSTEMS (outside boundary)
+    ══════════════════════════ -->
+    <mxCell id="c2_snow" value="&lt;b&gt;ServiceNow&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[External System]&lt;br&gt;ITSM — Change Request&lt;br&gt;management&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=11;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="1160" y="650" width="160" height="100" as="geometry" />
+    </mxCell>
+    <mxCell id="c2_sonar" value="&lt;b&gt;SonarQube&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[External System]&lt;br&gt;Code quality and&lt;br&gt;coverage dashboard&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=11;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="1160" y="390" width="160" height="100" as="geometry" />
+    </mxCell>
+    <mxCell id="c2_artifactory" value="&lt;b&gt;Artifactory&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[External System]&lt;br&gt;Docker image artifact&lt;br&gt;storage and versioning&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=11;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="1160" y="200" width="160" height="100" as="geometry" />
+    </mxCell>
+    <mxCell id="c2_jira" value="&lt;b&gt;JIRA&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;[External System]&lt;br&gt;Test case and defect&lt;br&gt;traceability&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=11;arcSize=5;align=center;" vertex="1" parent="1">
+      <mxGeometry x="1160" y="530" width="160" height="100" as="geometry" />
+    </mxCell>
+
+    <!-- ══════════════════════════
+         RELATIONSHIPS — Container Level
+    ══════════════════════════ -->
+
+    <!-- People → Containers -->
+    <mxCell id="cr1" value="Pushes code,&lt;br&gt;opens PR" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c2_dev" target="c_github" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="cr2" value="Reviews CI results,&lt;br&gt;merges PR" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c2_dev" target="c_gates" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="cr3" value="Executes E2E&lt;br&gt;&amp; NFT testing" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c2_qa" target="c_sandboxes" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="cr4" value="Signs off Test&lt;br&gt;Exit Report" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c2_qa" target="c_release" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="cr5" value="Approves CR,&lt;br&gt;coordinates deploy" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c2_rm" target="c_change" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- GitHub → Jenkins -->
+    <mxCell id="cr6" value="Webhook on PR Open&lt;br&gt;and PR Merge" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_github" target="c_jenkins" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Jenkins → Shared Library -->
+    <mxCell id="cr7" value="Loads shared pipeline&lt;br&gt;functions and image ref" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_jenkins" target="c_sharedlib" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Jenkins → Docker -->
+    <mxCell id="cr8" value="Spins up container,&lt;br&gt;authenticates to org" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_jenkins" target="c_docker" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Docker → CI Gates -->
+    <mxCell id="cr9" value="Executes Apex, Jest,&lt;br&gt;SSAP, SF Validation" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_docker" target="c_gates" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Docker → Sandboxes -->
+    <mxCell id="cr10" value="Deploys metadata via&lt;br&gt;SFDX on merge" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_docker" target="c_sandboxes" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Gates → Release -->
+    <mxCell id="cr11" value="Passes gates,&lt;br&gt;enables promotion" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_gates" target="c_release" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Release → Change -->
+    <mxCell id="cr12" value="Triggers CR creation&lt;br&gt;on PR to Prod" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_release" target="c_change" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Gates → JET -->
+    <mxCell id="cr13" value="Pushes all test&lt;br&gt;results for audit" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;endArrow=block;endFill=1;fontStyle=1;" edge="1" source="c_gates" target="c_jet" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Change → SNOW -->
+    <mxCell id="cr14" value="Creates and updates&lt;br&gt;Change Request" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c_change" target="c2_snow" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Gates → Sonar -->
+    <mxCell id="cr15" value="Uploads coverage&lt;br&gt;and quality report" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c_gates" target="c2_sonar" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Docker → Artifactory -->
+    <mxCell id="cr16" value="Pulls versioned&lt;br&gt;SFDX image" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c_docker" target="c2_artifactory" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- JET → JIRA -->
+    <mxCell id="cr17" value="Reads test case&lt;br&gt;traceability data" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#666666;fontColor=#444444;fontSize=10;endArrow=block;endFill=1;" edge="1" source="c_jet" target="c2_jira" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Legend L2 -->
+    <mxCell id="leg2_title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+      <mxGeometry x="30" y="900" width="100" height="24" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2_person" value="Person" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;fillColor=#08427b;fontColor=#ffffff;strokeColor=#073760;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="30" y="930" width="80" height="55" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2_container" value="Container (internal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=10;arcSize=5;" vertex="1" parent="1">
+      <mxGeometry x="140" y="944" width="140" height="36" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2_ext" value="External System" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#ffffff;strokeColor=#6b6b6b;fontSize=10;arcSize=5;" vertex="1" parent="1">
+      <mxGeometry x="310" y="944" width="140" height="36" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2_rel_int" value="Internal relationship" style="endArrow=block;endFill=1;strokeColor=#1168bd;fontColor=#1168bd;fontSize=10;fontStyle=1;" edge="1" parent="1">
+      <mxGeometry x="480" y="962" width="160" height="10" as="geometry">
+        <Array as="points">
+          <mxPoint x="600" y="962" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="leg2_rel_ext" value="External relationship" style="endArrow=block;endFill=1;strokeColor=#666666;fontColor=#444444;fontSize=10;" edge="1" parent="1">
+      <mxGeometry x="680" y="962" width="160" height="10" as="geometry">
+        <Array as="points">
+          <mxPoint x="800" y="962" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+
+</mxGraphModel>
