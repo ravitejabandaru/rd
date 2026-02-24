@@ -1,0 +1,408 @@
+<p><strong>Platform:</strong> Cloudbees + Jenkins + Docker &nbsp;|&nbsp; <strong>Repo:</strong> dynamo-salesforce &nbsp;|&nbsp; <strong>Team:</strong> Dynamo-V2-Salesforce</p>
+
+<ac:structured-macro ac:name="info">
+  <ac:parameter ac:name="title">About This Page</ac:parameter>
+  <ac:rich-text-body>
+    <p>This page documents the end-to-end CI/CD pipeline for the Salesforce platform. It covers the full lifecycle from developer code changes through automated testing, governance, and production deployment. The <strong>Dev → PR → CI Pipeline</strong> section is the primary focus area highlighted throughout.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h1>Pipeline Overview</h1>
+
+<table>
+  <colgroup>
+    <col style="width: 14%;" />
+    <col style="width: 58%;" />
+    <col style="width: 28%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Phase</strong></th>
+      <th><strong>Key Steps</strong></th>
+      <th><strong>Tools</strong></th>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Purple</ac:parameter><ac:parameter ac:name="title">Development</ac:parameter></ac:structured-macro></td>
+      <td>Developer works in personal sandbox → raises PR to Dev branch</td>
+      <td>Bitbucket, Dev Sandbox</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">CI Pipeline ★</ac:parameter></ac:structured-macro></td>
+      <td>Apex Tests, Jest Tests, SonarQube Scan, Salesforce Validation — all triggered on PR Open</td>
+      <td>Jenkins, Docker, SFDX CLI, Sonar</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Integration</ac:parameter></ac:structured-macro></td>
+      <td>Merge to Dev → auto-deploy to INT sandbox (continuous)</td>
+      <td>Cloudbees, INT Sandbox</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Testing</ac:parameter></ac:structured-macro></td>
+      <td>Sprint end → Release branch cut → E2E → NFT → Test Exit Report reviewed</td>
+      <td>Selenium, Playwright, JIRA, JET</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Governance</ac:parameter></ac:structured-macro></td>
+      <td>SSAP Scan, Auto SNOW Change Request, Peer Review, Change Approval, Comms</td>
+      <td>ServiceNow, SSAP, JET</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Production</ac:parameter></ac:structured-macro></td>
+      <td>Quick Deploy → Post-Deploy Steps → Post-Deploy Validation → CR Closed</td>
+      <td>Salesforce, ServiceNow</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Phase 1 — Development</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">Developer Workflow</ac:parameter>
+  <ac:parameter ac:name="borderColor">#8B72FF</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#EAE4FF</ac:parameter>
+  <ac:rich-text-body>
+    <ol>
+      <li><strong>Work in Personal Dev Sandbox</strong> — Each squad and developer has their own isolated Salesforce sandbox for building and testing changes independently.</li>
+      <li><strong>Raise a Pull Request to the Dev Branch</strong> — Once changes are ready, the developer opens a PR against the <code>Dev</code> trunk branch in Bitbucket.</li>
+      <li><strong>Jenkins Webhook Fires</strong> — The PR Open event triggers the Cloudbees/Jenkins CI pipeline automatically via SCM webhook configuration.</li>
+    </ol>
+    <p><strong>Branch model:</strong> Trunk-based development. <code>Dev</code> is the main integration branch.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Phase 2 — CI Pipeline (Dev → PR Open) ★</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">★ Highlighted Focus Area — Automated CI Checks on PR Open</ac:parameter>
+  <ac:parameter ac:name="borderColor">#0052CC</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#DEEBFF</ac:parameter>
+  <ac:rich-text-body>
+    <p>Whenever a Pull Request is <strong>opened</strong> against the Dev branch, the following automated checks are triggered via the Jenkinsfile using the Docker-based SFDX CLI container:</p>
+
+    <table>
+      <colgroup>
+        <col style="width: 22%;" />
+        <col style="width: 45%;" />
+        <col style="width: 33%;" />
+      </colgroup>
+      <tbody>
+        <tr>
+          <th>Check</th>
+          <th>Description</th>
+          <th>Pass / Fail Rule</th>
+        </tr>
+        <tr>
+          <td><strong>Apex Unit Tests</strong></td>
+          <td>Salesforce Apex test classes are executed against the sandbox</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">PASS ≥ 75% Coverage</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td><strong>Jest Tests (LWC)</strong></td>
+          <td>Lightning Web Component unit tests run and results uploaded to SonarQube</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">PASS if above threshold</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td><strong>SonarQube Scan</strong></td>
+          <td>Code quality and coverage analysis published to Sonar dashboard (branch: Dev)</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Uploaded &amp; Analysed</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td><strong>Salesforce Validation</strong></td>
+          <td>Full metadata validation run against the target sandbox</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if Apex &lt; 75%</ac:parameter></ac:structured-macro></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ac:structured-macro ac:name="note">
+      <ac:parameter ac:name="title">On PR Merge → Auto Deploy</ac:parameter>
+      <ac:rich-text-body>
+        <p>When a new commit is detected in the Dev branch (i.e. PR is merged), Jenkins automatically kicks off deployment to the <strong>INT</strong> sandbox for continuous integration testing.</p>
+      </ac:rich-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">How the CI Toolchain Works Together (Docker + Jenkins + Cloudbees)</ac:parameter>
+  <ac:rich-text-body>
+    <ol>
+      <li><strong>Docker Image</strong> — A portable container is built containing the SFDX CLI, all required plugins, proxy configuration, and Git. Any changes to the image go through a dedicated Artifactory pipeline to produce a versioned artifact.</li>
+      <li><strong>Shared Library</strong> — The Docker image version is referenced in <code>sfdx-app.yaml</code> inside the Dynamo Shared Library. This library exposes reusable functions for SFDX, SSAP, and SonarQube automation.</li>
+      <li><strong>Jenkinsfile</strong> — The repo's Jenkinsfile references the Shared Library and orchestrates all CI steps. Jenkins (via Cloudbees) authenticates the Docker container against the target sandbox and executes the automation defined in the script.</li>
+    </ol>
+    <table>
+      <tbody>
+        <tr>
+          <th>Component</th>
+          <th>Role</th>
+        </tr>
+        <tr>
+          <td>Cloudbees</td>
+          <td>Enterprise Jenkins platform; manages webhook events and pipeline execution</td>
+        </tr>
+        <tr>
+          <td>Jenkins / Jenkinsfile</td>
+          <td>Defines all CI/CD steps; orchestrates Docker container and automation</td>
+        </tr>
+        <tr>
+          <td>Docker Image</td>
+          <td>Provides consistent, portable SFDX CLI environment across all pipeline runs</td>
+        </tr>
+        <tr>
+          <td>Dynamo Shared Library</td>
+          <td>Centralised reusable functions (SFDX, SSAP, Sonar) consumed by Jenkinsfile</td>
+        </tr>
+        <tr>
+          <td>Artifactory</td>
+          <td>Stores and versions Docker image artifacts; promotes images for use in pipelines</td>
+        </tr>
+      </tbody>
+    </table>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Phase 3 — Integration (Dev Branch → INT Sandbox)</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">Continuous Integration Deployment</ac:parameter>
+  <ac:parameter ac:name="borderColor">#36B37E</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#E3FCEF</ac:parameter>
+  <ac:rich-text-body>
+    <ul>
+      <li><code>Dev</code> is the trunk-based development branch. Every merged PR triggers an automatic deployment to the <strong>INT</strong> (Integration) sandbox.</li>
+      <li>INT is used for continuous integration and unit testing across all squad contributions.</li>
+      <li>At the end of each sprint, a <strong>Release Branch</strong> is cut from Dev and promoted forward for testing.</li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Phase 4 — Testing (E2E &amp; NFT Sandboxes)</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">Release Testing Flow</ac:parameter>
+  <ac:parameter ac:name="borderColor">#FF8B00</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#FFFAE6</ac:parameter>
+  <ac:rich-text-body>
+    <ol>
+      <li><strong>E2E Sandbox</strong> — Release branch is deployed to E2E for end-to-end testing at sprint end.</li>
+      <li><strong>NFT Sandbox</strong> — After E2E sign-off, the release is promoted to NFT (Non-Functional Testing) the following sprint.</li>
+      <li><strong>Automated Regression</strong> — Selenium and Playwright regression suites are executed.</li>
+      <li><strong>Test Exit Report</strong> — Open bugs are reviewed; test exit report must be signed off before proceeding to production.</li>
+      <li><strong>JET</strong> — All test results and evidence are stored in JET (test evidence platform) for audit and traceability.</li>
+    </ol>
+
+    <table>
+      <tbody>
+        <tr>
+          <th>Test Type</th>
+          <th>Pass Threshold</th>
+        </tr>
+        <tr>
+          <td>Selenium (Automated Regression)</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if pass rate &lt; 90%</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Playwright (Automated Regression)</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if pass rate &lt; 90%</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Manual Regression / JIRA Traceability</td>
+          <td>Reviewed manually; linked to JIRA test cases</td>
+        </tr>
+      </tbody>
+    </table>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Phase 5 — Governance &amp; Change Management</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">PR to Production — Validation &amp; Approval Gate</ac:parameter>
+  <ac:parameter ac:name="borderColor">#FF5630</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#FFEBE6</ac:parameter>
+  <ac:rich-text-body>
+    <p>A PR is raised from the Release Branch to the <strong>Prod</strong> branch. This triggers a full validation run and initiates the change management process:</p>
+
+    <table>
+      <tbody>
+        <tr>
+          <th>Check</th>
+          <th>Outcome</th>
+        </tr>
+        <tr>
+          <td>Salesforce Validation</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if Apex &lt; 75%</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>SSAP Security Scan</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if V1 or V2 vulnerabilities found</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Jest Tests</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if below coverage threshold</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Selenium Regression</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if pass rate &lt; 90%</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Playwright Regression</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">FAIL if pass rate &lt; 90%</ac:parameter></ac:structured-macro></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Change Management Steps:</strong></p>
+    <ol>
+      <li><strong>Auto SNOW CR Created</strong> — A ServiceNow Change Request is automatically generated by the CI/CD pipeline upon successful PR validation.</li>
+      <li><strong>Peer Review of Change Task</strong> — A reviewer (other than the Change owner) validates the CHG and PR, gives sign-off or raises concerns to the deployment owner.</li>
+      <li><strong>Change Approved</strong> — Change is sent for approval and moved through the SNOW workflow.</li>
+      <li><strong>Comms Sent</strong> — The comms team notifies the Contact Center about deployment timelines.</li>
+      <li><strong>Test Evidence in JET</strong> — All results (Apex, Jest, Selenium, Playwright, JIRA traceability) stored for audit.</li>
+    </ol>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Phase 6 — Production Deployment</h1>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">Deployment &amp; Post-Deployment</ac:parameter>
+  <ac:parameter ac:name="borderColor">#172B4D</ac:parameter>
+  <ac:parameter ac:name="titleBGColor">#DFE1E6</ac:parameter>
+  <ac:rich-text-body>
+    <ol>
+      <li><strong>PR Reviewed and Merged</strong> — Peer team members review the PR; merge is approved once all checks pass.</li>
+      <li><strong>CR Moved to Implement</strong> — SNOW Change Request status updated; PR merge enables Salesforce Quick Deploy (pre-validated artifact).</li>
+      <li><strong>Salesforce Quick Deploy</strong> — Deployment executed within the approved deployment window. Uses the pre-validated package to minimise risk and downtime.</li>
+      <li><strong>Post-Deployment Steps</strong> — Manual steps from the Release Notes (e.g. Sprint 217 Release Notes) are executed by the deployment team.</li>
+      <li><strong>Post-Deployment Validation</strong> — Validation steps as specified in the Change Request are run to confirm successful deployment.</li>
+      <li><strong>CR Moved to Review → Closed</strong> — Change Request lifecycle is completed in ServiceNow.</li>
+    </ol>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr/>
+
+<h1>Sandbox Environment Summary</h1>
+
+<table>
+  <colgroup>
+    <col style="width: 15%;" />
+    <col style="width: 20%;" />
+    <col style="width: 45%;" />
+    <col style="width: 20%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Sandbox</th>
+      <th>Owner</th>
+      <th>Purpose</th>
+      <th>Deployment Trigger</th>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Purple</ac:parameter><ac:parameter ac:name="title">Dev Orgs</ac:parameter></ac:structured-macro></td>
+      <td>Individual Squads / Developers</td>
+      <td>Personal development and unit testing before raising a PR</td>
+      <td>Manual</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">INT</ac:parameter></ac:structured-macro></td>
+      <td>Shared / Team</td>
+      <td>Continuous integration and unit testing; always reflects latest Dev branch</td>
+      <td>Auto on every Dev merge</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">E2E</ac:parameter></ac:structured-macro></td>
+      <td>Shared / QA</td>
+      <td>End-to-end functional testing of the release candidate</td>
+      <td>Sprint end — Release branch</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">NFT</ac:parameter></ac:structured-macro></td>
+      <td>Shared / QA</td>
+      <td>Non-functional testing (performance, stability) after E2E sign-off</td>
+      <td>Next sprint after E2E</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">PROD</ac:parameter></ac:structured-macro></td>
+      <td>Deployment Team</td>
+      <td>Live production environment</td>
+      <td>Approved deployment window</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Key Quality Gates Summary</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>Gate</th>
+      <th>Metric</th>
+      <th>Result if Failed</th>
+    </tr>
+    <tr>
+      <td>Apex Code Coverage</td>
+      <td>≥ 75%</td>
+      <td>Pipeline blocked; PR cannot be merged</td>
+    </tr>
+    <tr>
+      <td>Jest Coverage</td>
+      <td>Above configured threshold</td>
+      <td>Pipeline blocked</td>
+    </tr>
+    <tr>
+      <td>SSAP Security Scan</td>
+      <td>No V1 or V2 vulnerabilities</td>
+      <td>Pipeline blocked; security review required</td>
+    </tr>
+    <tr>
+      <td>Selenium Regression</td>
+      <td>≥ 90% pass rate</td>
+      <td>Release cannot proceed to production</td>
+    </tr>
+    <tr>
+      <td>Playwright Regression</td>
+      <td>≥ 90% pass rate</td>
+      <td>Release cannot proceed to production</td>
+    </tr>
+    <tr>
+      <td>Test Exit Report</td>
+      <td>All open bugs reviewed and accepted</td>
+      <td>PR to Prod not raised until signed off</td>
+    </tr>
+    <tr>
+      <td>SNOW Change Approval</td>
+      <td>Change approved by all required approvers</td>
+      <td>Deployment window cannot commence</td>
+    </tr>
+  </tbody>
+</table>
+
+<ac:structured-macro ac:name="note">
+  <ac:parameter ac:name="title">Related Resources</ac:parameter>
+  <ac:rich-text-body>
+    <ul>
+      <li><strong>Detailed Git Flow:</strong> See GitFlow diagram on the DIGPROJECT Confluence space</li>
+      <li><strong>Sample Test Exit Report:</strong> Salesforce Release 220 Test Exit Report (available in JET)</li>
+      <li><strong>Change Request Process:</strong> Normal Change process — refer to go/lebtechem</li>
+      <li><strong>Post-Deployment Validation Steps:</strong> Available on the team Confluence wiki</li>
+      <li><strong>Test Evidence Platform:</strong> JET — all deployment test results stored per release</li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>

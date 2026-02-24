@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="3700" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ══════════════════════════════════════
+         TITLE
+    ══════════════════════════════════════ -->
+    <mxCell id="ttl1" value="Salesforce CI/CD Pipeline — Current State" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+      <mxGeometry x="150" y="14" width="1100" height="38" as="geometry"/>
+    </mxCell>
+    <mxCell id="ttl2" value="GitHub · Jenkins · Cloudbees · Docker · Salesforce · ServiceNow · SonarQube · JET   |   No internal URLs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontColor=#5e6c84;" vertex="1" parent="1">
+      <mxGeometry x="150" y="50" width="1100" height="22" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE BACKGROUND BANDS
+    ══════════════════════════════════════ -->
+
+    <!-- Phase 1: Development & CI -->
+    <mxCell id="bg1" value="Phase 1 — Development &amp; CI Pipeline" style="text;html=1;strokeColor=#3b82f6;strokeWidth=2;fillColor=#dbeafe;fontSize=12;fontStyle=1;fontColor=#1d4ed8;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;rounded=0;" vertex="1" parent="1">
+      <mxGeometry x="80" y="78" width="1240" height="632" as="geometry"/>
+    </mxCell>
+
+    <!-- Phase 2: Integration -->
+    <mxCell id="bg2" value="Phase 2 — Integration" style="text;html=1;strokeColor=#34d399;strokeWidth=2;fillColor=#d1fae5;fontSize=12;fontStyle=1;fontColor=#065f46;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;rounded=0;" vertex="1" parent="1">
+      <mxGeometry x="80" y="710" width="1240" height="130" as="geometry"/>
+    </mxCell>
+
+    <!-- Phase 3: Release & Testing -->
+    <mxCell id="bg3" value="Phase 3 — Release &amp; Testing" style="text;html=1;strokeColor=#fbbf24;strokeWidth=2;fillColor=#fef3c7;fontSize=12;fontStyle=1;fontColor=#92400e;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;rounded=0;" vertex="1" parent="1">
+      <mxGeometry x="80" y="840" width="1240" height="720" as="geometry"/>
+    </mxCell>
+
+    <!-- Phase 4: Governance & Change Management -->
+    <mxCell id="bg4" value="Phase 4 — Governance &amp; Change Management" style="text;html=1;strokeColor=#f87171;strokeWidth=2;fillColor=#fee2e2;fontSize=12;fontStyle=1;fontColor=#991b1b;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;rounded=0;" vertex="1" parent="1">
+      <mxGeometry x="80" y="1560" width="1240" height="1060" as="geometry"/>
+    </mxCell>
+
+    <!-- Phase 5: Production Deployment -->
+    <mxCell id="bg5" value="Phase 5 — Production Deployment" style="text;html=1;strokeColor=#8b5cf6;strokeWidth=2;fillColor=#ede9fe;fontSize=12;fontStyle=1;fontColor=#4c1d95;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;rounded=0;" vertex="1" parent="1">
+      <mxGeometry x="80" y="2620" width="1240" height="1000" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE 1 NODES — Development & CI
+    ══════════════════════════════════════ -->
+
+    <!-- START -->
+    <mxCell id="n01" value="Start: Development" style="ellipse;whiteSpace=wrap;html=1;fillColor=#36B37E;fontColor=#ffffff;strokeColor=#00875A;fontSize=13;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="108" width="280" height="55" as="geometry"/>
+    </mxCell>
+
+    <!-- Developer raises PR to Dev branch -->
+    <mxCell id="n02" value="Developer Raises PR to Dev Branch" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="218" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Automated Tests (decision diamond) -->
+    <mxCell id="n03" value="Automated Tests" style="rhombus;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="620" y="335" width="160" height="130" as="geometry"/>
+    </mxCell>
+
+    <!-- Jest Tests Run -->
+    <mxCell id="n04" value="Jest Tests Run" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="528" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE 2 NODES — Integration
+    ══════════════════════════════════════ -->
+
+    <!-- Deploy to INT Sandbox -->
+    <mxCell id="n05" value="Deploy to INT Sandbox" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#065f46;fontColor=#ffffff;strokeColor=#047857;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="730" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE 3 NODES — Release & Testing
+    ══════════════════════════════════════ -->
+
+    <!-- Sprint End: Cut Release Branch -->
+    <mxCell id="n06" value="Sprint End: Cut Release Branch from Dev" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#92400e;fontColor=#ffffff;strokeColor=#78350f;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="865" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Deploy to E2E Org -->
+    <mxCell id="n07" value="Deploy to E2E Org" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b45309;fontColor=#ffffff;strokeColor=#92400e;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="975" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Testing in E2E -->
+    <mxCell id="n08" value="Testing in E2E" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b45309;fontColor=#ffffff;strokeColor=#92400e;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="1085" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Deploy to NFT Org -->
+    <mxCell id="n09" value="Deploy to NFT Org" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b45309;fontColor=#ffffff;strokeColor=#92400e;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="1195" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Regression Testing in NFT -->
+    <mxCell id="n10" value="Regression Testing in NFT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b45309;fontColor=#ffffff;strokeColor=#92400e;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="1305" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Review Test Exit Report (decision diamond) -->
+    <mxCell id="n11" value="Review Test Exit Report" style="rhombus;whiteSpace=wrap;html=1;fillColor=#d97706;fontColor=#ffffff;strokeColor=#b45309;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="620" y="1415" width="160" height="130" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE 4 NODES — Governance
+    ══════════════════════════════════════ -->
+
+    <!-- Raise PR to Prod Branch -->
+    <mxCell id="n12" value="Raise PR to Prod Branch" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="1595" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- PR Validation (decision diamond) -->
+    <mxCell id="n13" value="PR Validation" style="rhombus;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="620" y="1710" width="160" height="130" as="geometry"/>
+    </mxCell>
+
+    <!-- PARALLEL CHECKS (y=1900) -->
+    <!-- Salesforce Validation -->
+    <mxCell id="n14" value="Salesforce Validation&#xa;Apex &gt; 75%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="100" y="1908" width="175" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- SSAP Scan -->
+    <mxCell id="n15" value="SSAP Scan&#xa;No V1/V2 Vulnerabilities" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="295" y="1908" width="175" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Jest Coverage -->
+    <mxCell id="n16" value="Jest&#xa;Coverage Check" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="490" y="1908" width="175" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Selenium -->
+    <mxCell id="n17" value="Selenium&#xa;Pass Rate &gt; 90%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="685" y="1908" width="175" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Playwright -->
+    <mxCell id="n18" value="Playwright&#xa;Pass Rate &gt; 90%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7f1d1d;fontColor=#ffffff;strokeColor=#991b1b;fontSize=11;fontStyle=1;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="880" y="1908" width="175" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Store Test Results in JET -->
+    <mxCell id="n19" value="Store Test Results in JET" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2050" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Auto-create SNOW Change Request -->
+    <mxCell id="n20" value="Auto-Create SNOW Change Request" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2162" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Peer Review Change Task -->
+    <mxCell id="n21" value="Peer Review Change Task" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2274" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Complete Change Tasks -->
+    <mxCell id="n22" value="Complete Change Tasks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#991b1b;fontColor=#ffffff;strokeColor=#7f1d1d;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2386" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Change Approval (decision diamond) -->
+    <mxCell id="n23" value="Change Approval" style="rhombus;whiteSpace=wrap;html=1;fillColor=#b45309;fontColor=#ffffff;strokeColor=#92400e;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="620" y="2498" width="160" height="130" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         PHASE 5 NODES — Production
+    ══════════════════════════════════════ -->
+
+    <!-- Send Deployment Comms -->
+    <mxCell id="n24" value="Send Deployment Comms" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2648" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- PR Reviewed and Merged -->
+    <mxCell id="n25" value="PR Reviewed and Merged" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2758" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Enable Quick Deploy -->
+    <mxCell id="n26" value="Enable Quick Deploy" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2868" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Move CR to Implement -->
+    <mxCell id="n27" value="Move CR to Implement" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="2978" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Quick Deploy to Production (highlighted) -->
+    <mxCell id="n28" value="Quick Deploy to Production" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dc2626;fontColor=#ffffff;strokeColor=#b91c1c;fontSize=13;fontStyle=1;strokeWidth=3;" vertex="1" parent="1">
+      <mxGeometry x="560" y="3088" width="280" height="65" as="geometry"/>
+    </mxCell>
+
+    <!-- Post-Deployment Steps -->
+    <mxCell id="n29" value="Post-Deployment Steps" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="3205" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Post-Deployment Validation -->
+    <mxCell id="n30" value="Post-Deployment Validation" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="3315" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Move CR to Review -->
+    <mxCell id="n31" value="Move CR to Review" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4c1d95;fontColor=#ffffff;strokeColor=#3b0764;fontSize=12;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="3425" width="280" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Deployment Completed (END) -->
+    <mxCell id="n32" value="Deployment Completed" style="ellipse;whiteSpace=wrap;html=1;fillColor=#36B37E;fontColor=#ffffff;strokeColor=#00875A;fontSize=13;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="560" y="3535" width="280" height="55" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         EDGES — Main sequential flow
+    ══════════════════════════════════════ -->
+
+    <mxCell id="e01" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;" edge="1" source="n01" target="n02" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e02" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n02" target="n03" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Diamond → Jest: label "Apex Tests >75%" -->
+    <mxCell id="e03" value="Apex Tests &gt; 75%" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#1d4ed8;fontStyle=1;align=left;spacingLeft=4;" edge="1" source="n03" target="n04" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Jest → Deploy INT: label "Upload to Sonar" -->
+    <mxCell id="e04" value="Upload to Sonar" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#065f46;fontStyle=1;align=left;spacingLeft=4;" edge="1" source="n04" target="n05" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e05" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n05" target="n06" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e06" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n06" target="n07" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e07" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n07" target="n08" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e08" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n08" target="n09" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e09" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n09" target="n10" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n10" target="n11" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Exit Report diamond → Raise PR: label "Bugs Reviewed" -->
+    <mxCell id="e11" value="Bugs Reviewed" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#991b1b;fontStyle=1;align=left;spacingLeft=4;" edge="1" source="n11" target="n12" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n12" target="n13" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         EDGES — PR Validation → 5 parallel checks
+    ══════════════════════════════════════ -->
+
+    <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n13" target="n14" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n13" target="n15" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n13" target="n16" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n13" target="n17" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n13" target="n18" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         EDGES — 5 parallel checks → Store JET
+    ══════════════════════════════════════ -->
+
+    <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n14" target="n19" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n15" target="n19" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n16" target="n19" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n17" target="n19" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e22" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" source="n18" target="n19" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         EDGES — Governance sequential
+    ══════════════════════════════════════ -->
+
+    <mxCell id="e23" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n19" target="n20" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e24" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n20" target="n21" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e25" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n21" target="n22" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e26" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n22" target="n23" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Change Approval → Send Comms: label "Approved" -->
+    <mxCell id="e27" value="Approved" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#4c1d95;fontStyle=1;align=left;spacingLeft=4;" edge="1" source="n23" target="n24" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         EDGES — Production sequential
+    ══════════════════════════════════════ -->
+
+    <mxCell id="e28" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n24" target="n25" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e29" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n25" target="n26" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e30" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n26" target="n27" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e31" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n27" target="n28" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e32" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n28" target="n29" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e33" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n29" target="n30" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e34" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n30" target="n31" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e35" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" source="n31" target="n32" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ══════════════════════════════════════
+         LEGEND
+    ══════════════════════════════════════ -->
+
+    <mxCell id="leg_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#d1d5db;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="80" y="3618" width="1240" height="64" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg_lbl" value="Legend:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#374151;" vertex="1" parent="1">
+      <mxGeometry x="95" y="3628" width="70" height="44" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg1" value="Start / End" style="ellipse;whiteSpace=wrap;html=1;fillColor=#36B37E;fontColor=#ffffff;strokeColor=#00875A;fontSize=11;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="175" y="3632" width="120" height="36" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg2" value="Process Step" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1168bd;fontColor=#ffffff;strokeColor=#0e5ca8;fontSize=11;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="315" y="3632" width="120" height="36" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg3" value="Decision" style="rhombus;whiteSpace=wrap;html=1;fillColor=#d97706;fontColor=#ffffff;strokeColor=#b45309;fontSize=11;fontStyle=1;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="455" y="3622" width="90" height="56" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg4" value="Key Action" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dc2626;fontColor=#ffffff;strokeColor=#b91c1c;fontSize=11;fontStyle=1;strokeWidth=3;" vertex="1" parent="1">
+      <mxGeometry x="565" y="3632" width="120" height="36" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg5a" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#374151;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="705" y="3650" as="sourcePoint"/>
+        <mxPoint x="770" y="3650" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="leg5b" value="Main Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontColor=#374151;" vertex="1" parent="1">
+      <mxGeometry x="778" y="3632" width="90" height="36" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg6a" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#991b1b;strokeWidth=1.5;endArrow=block;endFill=1;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="878" y="3650" as="sourcePoint"/>
+        <mxPoint x="943" y="3650" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="leg6b" value="Parallel Check" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontColor=#374151;" vertex="1" parent="1">
+      <mxGeometry x="951" y="3632" width="110" height="36" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

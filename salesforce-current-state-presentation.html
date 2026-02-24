@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salesforce Platform — Current State | Leadership Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0F1C2E;
+  --navy2: #162234;
+  --slate: #1E3352;
+  --mid: #2C4A72;
+  --steel: #4A6FA5;
+  --sky: #7BAFD4;
+  --amber: #E8A838;
+  --amber2: #F5C842;
+  --cream: #F7F3ED;
+  --white: #FFFFFF;
+  --muted: #8BA5C8;
+  --border: rgba(123,175,212,0.15);
+  --border2: rgba(123,175,212,0.25);
+  --red: #E05C5C;
+  --green: #4EBA8C;
+  --tag-bg: rgba(232,168,56,0.12);
+  --tag-border: rgba(232,168,56,0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--navy);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+}
+
+/* ── Presentation shell ── */
+#deck {
+  width: 100vw; height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Slides ── */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(60px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+.slide.exit {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* ── Background textures ── */
+.slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 90% 10%, rgba(74,111,165,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 90%, rgba(232,168,56,0.07) 0%, transparent 60%),
+    linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+  z-index: 0;
+}
+
+.slide-inner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 64px 0;
+}
+
+/* ── Nav bar ── */
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(15,28,46,0.95);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.nav-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-btn {
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  color: var(--sky);
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.nav-btn:hover { background: var(--mid); color: var(--white); }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.nav-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-dot.active { background: var(--amber); border-color: var(--amber); width: 18px; border-radius: 3px; }
+
+.nav-counter {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  min-width: 44px;
+  text-align: center;
+}
+
+/* ── Slide header ── */
+.slide-header {
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.slide-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+  background: var(--tag-bg);
+  border: 1px solid var(--tag-border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.slide-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+
+.slide-title span { color: var(--amber); }
+
+.slide-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--border2);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Content area ── */
+.slide-content {
+  flex: 1;
+  overflow: hidden;
+  padding-bottom: 72px;
+}
+
+/* ═══════════════════════════════
+   SLIDE 1 — TITLE
+═══════════════════════════════ */
+.title-slide .slide-inner {
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 80px;
+}
+
+.title-slide::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  z-index: 0;
+}
+
+.title-kicker {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-kicker::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--amber);
+}
+
+.title-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.2rem;
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.title-main em {
+  font-style: normal;
+  color: var(--amber);
+}
+
+.title-sub {
+  font-size: 1.1rem;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 40px;
+  letter-spacing: 0.01em;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.title-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.pill {
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--sky);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+
+.title-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  display: flex;
+  gap: 28px;
+}
+
+.agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.agenda-card {
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.agenda-card:hover { background: var(--mid); border-color: var(--amber); transform: translateY(-2px); }
+
+.agenda-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.agenda-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sky);
+  line-height: 1.3;
+}
+
+/* ═══════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════ */
+
+/* Two-col layout */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 100%;
+}
+
+.three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* Cards */
+.card {
+  background: rgba(30,51,82,0.6);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.card-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.card-body {
+  font-size: 0.8rem;
+  color: var(--sky);
+  line-height: 1.65;
+}
+
+/* Step list */
+.step-list { display: flex; flex-direction: column; gap: 10px; }
+
+.step-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step-n {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--amber);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text { flex: 1; }
+.step-text strong { color: var(--white); font-size: 0.83rem; display: block; margin-bottom: 2px; }
+.step-text span { font-size: 0.75rem; color: var(--muted); line-height: 1.4; display: block; }
+
+/* Tags/badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-amber  { background: rgba(232,168,56,0.15); border: 1px solid rgba(232,168,56,0.4); color: var(--amber2); }
+.badge-blue   { background: rgba(123,175,212,0.12); border: 1px solid rgba(123,175,212,0.3); color: var(--sky); }
+.badge-green  { background: rgba(78,186,140,0.12); border: 1px solid rgba(78,186,140,0.3); color: var(--green); }
+.badge-red    { background: rgba(224,92,92,0.12); border: 1px solid rgba(224,92,92,0.3); color: var(--red); }
+.badge-slate  { background: var(--slate); border: 1px solid var(--border2); color: var(--muted); }
+
+/* Tool chip row */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  background: var(--navy);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--sky);
+}
+
+/* Flow diagram (horizontal) */
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.flow-node {
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sky);
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 90px;
+  position: relative;
+}
+
+.flow-node.highlighted {
+  background: rgba(232,168,56,0.1);
+  border-color: rgba(232,168,56,0.4);
+  color: var(--amber2);
+}
+
+.flow-node .fn-sub {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 3px;
+}
+
+.flow-arrow {
+  color: var(--border2);
+  font-size: 0.9rem;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+/* Stat boxes */
+.stat-row { display: flex; gap: 14px; margin-bottom: 16px; }
+
+.stat-box {
+  background: var(--slate);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  flex: 1;
+  text-align: center;
+}
+
+.stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--amber);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+/* Gate table */
+.gate-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.gate-table th {
+  background: var(--slate);
+  padding: 8px 12px;
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border2);
+}
+.gate-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--sky);
+  vertical-align: top;
+}
+.gate-table tr:last-child td { border-bottom: none; }
+.gate-table td:first-child { color: var(--white); font-weight: 500; }
+
+/* Section divider label */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Branch visual */
+.branch-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.branch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.branch-line {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.branch-commit {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.branch-track {
+  height: 2px;
+  flex: 1;
+}
+
+.branch-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: 100px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Sandbox env boxes */
+.env-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.env-box {
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 14px 10px;
+  text-align: center;
+  position: relative;
+}
+
+.env-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.env-type {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.env-arrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 10px;
+}
+
+.env-arr {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), var(--border2));
+  position: relative;
+}
+
+.env-arr::after {
+  content: '▶';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.5rem;
+  color: var(--border2);
+}
+
+/* Summary slide */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.obs-card {
+  background: rgba(30,51,82,0.5);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.obs-area {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+
+.obs-points { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+
+.obs-points li {
+  display: flex;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--sky);
+  line-height: 1.4;
+  align-items: flex-start;
+}
+
+.obs-points li::before {
+  content: '—';
+  color: var(--border2);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* slide content scroll fix */
+.slide-content { overflow-y: auto; }
+.slide-content::-webkit-scrollbar { width: 4px; }
+.slide-content::-webkit-scrollbar-track { background: transparent; }
+.slide-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <!-- ════════════════════════════════════════
+       SLIDE 1 — TITLE
+  ════════════════════════════════════════ -->
+  <div class="slide title-slide active" data-index="0">
+    <div class="slide-inner" style="justify-content:center;">
+      <div class="title-kicker">Leadership Review · February 2026</div>
+      <div class="title-main">Salesforce Platform<br><em>Current State</em></div>
+      <div class="title-sub">An honest look at how we build, test, release, and deploy Salesforce today — across code, pipelines, environments, and governance.</div>
+
+      <div class="title-pills">
+        <div class="pill"><div class="dot"></div>Cloudbees + Jenkins</div>
+        <div class="pill"><div class="dot"></div>Bitbucket SCM</div>
+        <div class="pill"><div class="dot"></div>Docker / SFDX CLI</div>
+        <div class="pill"><div class="dot"></div>ServiceNow</div>
+        <div class="pill"><div class="dot"></div>JET · Sonar · SSAP</div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="section-label">Five areas under review</div>
+        <div class="agenda-grid">
+          <div class="agenda-card" onclick="goTo(2)">
+            <div class="agenda-num">01</div>
+            <div class="agenda-name">Code Storage &amp; Repository</div>
+          </div>
+          <div class="agenda-card" onclick="goTo(3)">
+            <div class="agenda-num">02</div>
+            <div class="agenda-name">Release Management &amp; Branching</div>
+          </div>
+          <div class="agenda-card" onclick="goTo(4)">
+            <div class="agenda-num">03</div>
+            <div class="agenda-name">Deployment Pipeline</div>
+          </div>
+          <div class="agenda-card" onclick="goTo(5)">
+            <div class="agenda-num">04</div>
+            <div class="agenda-name">Environment &amp; Sandbox Management</div>
+          </div>
+          <div class="agenda-card" onclick="goTo(6)">
+            <div class="agenda-num">05</div>
+            <div class="agenda-name">Change Management &amp; Governance</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-meta">
+        <span>TEAM: DYNAMO-V2-SALESFORCE</span>
+        <span>PIPELINE: CLOUDBEES CI/CD</span>
+        <span>REVIEW: COPADO EVALUATION</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 2 — ARCHITECTURE OVERVIEW
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="1">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Overview</div>
+          <div class="slide-title">How Everything <span>Connects</span></div>
+        </div>
+        <div class="slide-num">00</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="section-label">End-to-end pipeline at a glance</div>
+        <div class="flow-row" style="margin-bottom:24px; gap:0;">
+          <div class="flow-node">Dev Sandbox<span class="fn-sub">Personal</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Bitbucket PR<span class="fn-sub">SCM</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Jenkins CI<span class="fn-sub">Webhook</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Dev Branch<span class="fn-sub">Trunk</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">INT Sandbox<span class="fn-sub">Auto Deploy</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Release Branch<span class="fn-sub">Sprint End</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">E2E / NFT<span class="fn-sub">Testing</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">PR → Prod<span class="fn-sub">Governance</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Production<span class="fn-sub">Quick Deploy</span></div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-val">3</div><div class="stat-lbl">Primary<br>Sandboxes</div></div>
+          <div class="stat-box"><div class="stat-val">5</div><div class="stat-lbl">CI Quality<br>Gates</div></div>
+          <div class="stat-box"><div class="stat-val">75%</div><div class="stat-lbl">Min Apex<br>Coverage</div></div>
+          <div class="stat-box"><div class="stat-val">90%</div><div class="stat-lbl">Min Regression<br>Pass Rate</div></div>
+          <div class="stat-box"><div class="stat-val">Auto</div><div class="stat-lbl">SNOW CR<br>Creation</div></div>
+        </div>
+
+        <div class="three-col" style="margin-top:4px;">
+          <div class="card">
+            <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),transparent);"></div>
+            <div class="card-label">CI/CD Platform</div>
+            <div class="card-title">Cloudbees + Jenkins</div>
+            <div class="card-body">SCM webhooks on PR Open and PR Merge trigger all pipeline automation. Jenkinsfile defines all steps.</div>
+            <div class="chips">
+              <div class="chip">Cloudbees</div>
+              <div class="chip">Jenkins</div>
+              <div class="chip">Webhooks</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-accent" style="background:linear-gradient(90deg,var(--sky),transparent);"></div>
+            <div class="card-label">Container Layer</div>
+            <div class="card-title">Docker SFDX Image</div>
+            <div class="card-body">All CI runs inside a Docker container with SFDX CLI, plugins, proxy config, and Git pre-configured. Versioned via Artifactory.</div>
+            <div class="chips">
+              <div class="chip">Docker</div>
+              <div class="chip">Artifactory</div>
+              <div class="chip">Shared Library</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-accent" style="background:linear-gradient(90deg,var(--green),transparent);"></div>
+            <div class="card-label">Quality &amp; Governance</div>
+            <div class="card-title">Sonar · SSAP · JET · SNOW</div>
+            <div class="card-body">Code quality, security scanning, test evidence, and change management are all automated and integrated into the pipeline.</div>
+            <div class="chips">
+              <div class="chip">SonarQube</div>
+              <div class="chip">SSAP</div>
+              <div class="chip">ServiceNow</div>
+              <div class="chip">JET</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 3 — CODE STORAGE & REPO
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="2">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Area 01 · Code Storage</div>
+          <div class="slide-title">Where Our <span>Code Lives</span></div>
+        </div>
+        <div class="slide-num">01</div>
+      </div>
+      <div class="slide-content">
+        <div class="two-col">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="section-label">Source Control</div>
+            <div class="card">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),transparent);"></div>
+              <div class="card-label">Primary Repository</div>
+              <div class="card-title">Bitbucket (Self-Hosted)</div>
+              <div class="card-body">
+                All Salesforce metadata, configuration, and automation scripts live in a self-hosted Bitbucket instance on internal AWS infrastructure (<code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:0.75rem;">bitbucket.dynamo.prd.aws.jpmchase.net</code>).
+              </div>
+              <div class="chips">
+                <div class="chip">DSF / dynamo-salesforce</div>
+                <div class="chip">dynamo-salesforce-image-builds</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--sky),transparent);"></div>
+              <div class="card-label">Shared Automation</div>
+              <div class="card-title">Dynamo Shared Library</div>
+              <div class="card-body">
+                A centralised shared library repo (<code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:0.75rem;">dynamo-shared-library</code>) holds reusable pipeline functions — SFDX, SSAP, Sonar — consumed by all Salesforce pipeline jobs via <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:0.75rem;">sfdx-app.yaml</code>.
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--green),transparent);"></div>
+              <div class="card-label">Docker Image Source</div>
+              <div class="card-title">Image Builds Repo</div>
+              <div class="card-body">The Dockerfile for the SFDX CLI container lives in its own repo. Changes here trigger a separate Artifactory pipeline to build and version the image artifact.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="section-label">Repository structure today</div>
+            <div class="card" style="flex:1;">
+              <div class="card-label">What each repo owns</div>
+              <table class="gate-table" style="margin-top:8px;">
+                <thead>
+                  <tr><th>Repository</th><th>Contents</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dynamo-salesforce</td>
+                    <td>Salesforce metadata, Jenkinsfile, CI/CD config</td>
+                  </tr>
+                  <tr>
+                    <td>dynamo-salesforce-image-builds</td>
+                    <td>Dockerfile for SFDX CLI container</td>
+                  </tr>
+                  <tr>
+                    <td>dynamo-shared-library</td>
+                    <td>Shared pipeline functions, sfdx-app.yaml (image version ref)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="section-label" style="margin-top:16px;">Key observations</div>
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text">
+                    <strong>Self-hosted Bitbucket</strong>
+                    <span>All code lives on internal JPMC infrastructure — no cloud-hosted SCM</span>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text">
+                    <strong>3 separate repos</strong>
+                    <span>Salesforce metadata, Docker image, and shared library are managed independently</span>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text">
+                    <strong>Image versioning via Artifactory</strong>
+                    <span>Docker image changes require a separate promotion pipeline before the shared library is updated</span>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text">
+                    <strong>No native Salesforce org tracking</strong>
+                    <span>Org state is managed entirely through Git metadata — no org-diff tooling in use today</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 4 — RELEASE MANAGEMENT
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="3">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Area 02 · Release Management</div>
+          <div class="slide-title">Branching &amp; <span>Release Strategy</span></div>
+        </div>
+        <div class="slide-num">02</div>
+      </div>
+      <div class="slide-content">
+        <div class="two-col">
+          <div>
+            <div class="section-label">Branch model</div>
+            <div class="branch-visual" style="margin-bottom:16px;">
+              <div class="branch-row">
+                <div class="branch-name" style="color:var(--muted);font-size:0.65rem;">Dev Sandboxes</div>
+                <div class="branch-line">
+                  <div class="branch-commit" style="background:var(--sky);"></div>
+                  <div class="branch-track" style="background:var(--sky);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--sky);"></div>
+                  <div class="branch-track" style="background:var(--sky);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--sky);"></div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--sky);margin-left:10px;">feature/*</div>
+              </div>
+              <div style="padding-left:100px;color:var(--border2);font-size:0.75rem;margin:-4px 0;">↓ PR merge</div>
+              <div class="branch-row">
+                <div class="branch-name" style="color:var(--amber);font-size:0.65rem;">Trunk</div>
+                <div class="branch-line">
+                  <div class="branch-commit" style="background:var(--amber);"></div>
+                  <div class="branch-track" style="background:var(--amber);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--amber);"></div>
+                  <div class="branch-track" style="background:var(--amber);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--amber);"></div>
+                  <div class="branch-track" style="background:var(--amber);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--amber);width:14px;height:14px;border-radius:4px;"></div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--amber);margin-left:10px;">dev</div>
+              </div>
+              <div style="padding-left:100px;color:var(--border2);font-size:0.75rem;margin:-4px 0;">↓ Sprint end cut</div>
+              <div class="branch-row">
+                <div class="branch-name" style="color:var(--green);font-size:0.65rem;">Release</div>
+                <div class="branch-line">
+                  <div class="branch-commit" style="background:var(--green);"></div>
+                  <div class="branch-track" style="background:var(--green);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--green);"></div>
+                  <div class="branch-track" style="background:var(--green);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--green);width:14px;height:14px;border-radius:4px;"></div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--green);margin-left:10px;">release/sprint-XXX</div>
+              </div>
+              <div style="padding-left:100px;color:var(--border2);font-size:0.75rem;margin:-4px 0;">↓ After approval</div>
+              <div class="branch-row">
+                <div class="branch-name" style="color:var(--red);font-size:0.65rem;">Production</div>
+                <div class="branch-line">
+                  <div class="branch-commit" style="background:var(--red);"></div>
+                  <div class="branch-track" style="background:var(--red);flex:1;"></div>
+                  <div class="branch-commit" style="background:var(--red);"></div>
+                </div>
+                <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--red);margin-left:10px;">prod</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Sprint cadence</div>
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-n">1</div>
+                  <div class="step-text"><strong>During Sprint</strong><span>Devs work in personal sandboxes, raise PRs to Dev branch continuously</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">2</div>
+                  <div class="step-text"><strong>Sprint End</strong><span>Release branch cut from Dev. Deployed to E2E for testing</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">3</div>
+                  <div class="step-text"><strong>Next Sprint</strong><span>Release promoted to NFT after E2E sign-off. Parallel dev continues on Dev branch</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">4</div>
+                  <div class="step-text"><strong>After Approval</strong><span>PR raised from Release → Prod. Merged and deployed within change window</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="section-label">Key observations</div>
+            <div class="card">
+              <div class="card-label">What the model looks like today</div>
+              <div class="step-list" style="margin-top:6px;">
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>Trunk-based with timed releases</strong><span>Dev is always deployable to INT. Releases are time-boxed to sprint boundaries — not feature-complete driven</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>One release branch per sprint</strong><span>Each sprint produces one named release branch. No parallel release trains today</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>Manual release branch creation</strong><span>Release branch cut is a manual step — no tooling to automate the cut from Dev at sprint end</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>Release spans two sprints</strong><span>E2E in sprint N, NFT and deployment in sprint N+1 — a single release takes two sprints from cut to prod</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>No release scheduling automation</strong><span>Deployment windows and comms are coordinated manually by the deployment owner and comms team</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),transparent);"></div>
+              <div class="card-label">Release artefacts produced</div>
+              <div class="chips" style="margin-top:6px;">
+                <div class="chip">Test Exit Report</div>
+                <div class="chip">PR Validation Summary</div>
+                <div class="chip">Test Evidence (JET)</div>
+                <div class="chip">Release Notes</div>
+                <div class="chip">SNOW Change Request</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 5 — DEPLOYMENT PIPELINE
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="4">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Area 03 · Deployment Pipeline</div>
+          <div class="slide-title">How Code Gets <span>Deployed</span></div>
+        </div>
+        <div class="slide-num">03</div>
+      </div>
+      <div class="slide-content">
+        <div class="section-label" style="margin-bottom:12px;">Two pipeline triggers</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+          <div class="card">
+            <div class="card-accent" style="background:linear-gradient(90deg,var(--sky),transparent);"></div>
+            <div class="card-label">Trigger 1 — PR Open</div>
+            <div class="card-title">Validation Pipeline</div>
+            <div class="card-body">
+              Jenkins webhook fires when a PR is opened. Runs all CI checks against the sandbox — Apex, Jest, Sonar, Salesforce Validation, SSAP. PR cannot merge until all gates pass.
+            </div>
+            <div class="chips">
+              <div class="chip badge-blue">Apex Tests</div>
+              <div class="chip">Jest</div>
+              <div class="chip">SonarQube</div>
+              <div class="chip">SSAP Scan</div>
+              <div class="chip">SF Validation</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),transparent);"></div>
+            <div class="card-label">Trigger 2 — PR Merge / New Commit</div>
+            <div class="card-title">Deployment Pipeline</div>
+            <div class="card-body">
+              When a new commit lands on a branch, Jenkins auto-deploys to the corresponding sandbox. Dev → INT continuously. Release branch → E2E/NFT on promotion.
+            </div>
+            <div class="chips">
+              <div class="chip">Dev → INT</div>
+              <div class="chip">Release → E2E</div>
+              <div class="chip">Release → NFT</div>
+              <div class="chip">Prod (Quick Deploy)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label">Pipeline execution detail</div>
+        <div class="two-col">
+          <div>
+            <div class="card">
+              <div class="card-label">How the container runs</div>
+              <div class="step-list" style="margin-top:8px;">
+                <div class="step-item">
+                  <div class="step-n">1</div>
+                  <div class="step-text"><strong>Jenkins pulls Docker image</strong><span>Image version defined in <code style="font-family:'DM Mono',monospace;font-size:0.75rem;background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:2px;">sfdx-app.yaml</code> in Shared Library</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">2</div>
+                  <div class="step-text"><strong>Container authenticates to Salesforce org</strong><span>Jenkins script connects SFDX CLI inside container to the target sandbox</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">3</div>
+                  <div class="step-text"><strong>Automation runs</strong><span>SFDX deploy, Apex test execution, Jest run, Sonar upload, SSAP scan — all orchestrated by Jenkinsfile</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">4</div>
+                  <div class="step-text"><strong>Results reported</strong><span>Pass/fail status returned to Bitbucket PR; test results stored in JET; Sonar dashboard updated</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-label">Quality gates enforced in pipeline</div>
+              <table class="gate-table" style="margin-top:8px;">
+                <thead>
+                  <tr><th>Check</th><th>Threshold</th><th>On Fail</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Apex Code Coverage</td>
+                    <td><span class="badge badge-amber">≥ 75%</span></td>
+                    <td>Pipeline blocked</td>
+                  </tr>
+                  <tr>
+                    <td>Jest Coverage</td>
+                    <td><span class="badge badge-amber">Threshold</span></td>
+                    <td>Pipeline blocked</td>
+                  </tr>
+                  <tr>
+                    <td>SSAP Security</td>
+                    <td><span class="badge badge-red">No V1/V2</span></td>
+                    <td>Pipeline blocked</td>
+                  </tr>
+                  <tr>
+                    <td>Selenium Regression</td>
+                    <td><span class="badge badge-amber">≥ 90%</span></td>
+                    <td>Release blocked</td>
+                  </tr>
+                  <tr>
+                    <td>Playwright Regression</td>
+                    <td><span class="badge badge-amber">≥ 90%</span></td>
+                    <td>Release blocked</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 6 — ENVIRONMENT / SANDBOX MGMT
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="5">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Area 04 · Environments</div>
+          <div class="slide-title">Sandbox <span>Management</span></div>
+        </div>
+        <div class="slide-num">04</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="section-label">Environment progression</div>
+        <div class="env-grid" style="margin-bottom:6px;">
+          <div class="env-box" style="border-color:rgba(123,175,212,0.4);background:rgba(123,175,212,0.06);">
+            <div class="env-name" style="color:var(--sky);">Dev Orgs</div>
+            <div class="env-type">Per developer / squad</div>
+          </div>
+          <div class="env-box" style="border-color:rgba(78,186,140,0.4);background:rgba(78,186,140,0.06);">
+            <div class="env-name" style="color:var(--green);">INT</div>
+            <div class="env-type">Integration</div>
+          </div>
+          <div class="env-box" style="border-color:rgba(232,168,56,0.4);background:rgba(232,168,56,0.06);">
+            <div class="env-name" style="color:var(--amber);">E2E</div>
+            <div class="env-type">End-to-End</div>
+          </div>
+          <div class="env-box" style="border-color:rgba(232,168,56,0.4);background:rgba(232,168,56,0.06);">
+            <div class="env-name" style="color:var(--amber);">NFT</div>
+            <div class="env-type">Non-Functional</div>
+          </div>
+          <div class="env-box" style="border-color:rgba(224,92,92,0.4);background:rgba(224,92,92,0.06);">
+            <div class="env-name" style="color:var(--red);">PROD</div>
+            <div class="env-type">Production</div>
+          </div>
+        </div>
+        <div class="env-arrow-row" style="margin-bottom:20px;">
+          <div class="env-arr"></div>
+          <div class="env-arr"></div>
+          <div class="env-arr"></div>
+          <div class="env-arr"></div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="section-label">What each environment does</div>
+            <table class="gate-table">
+              <thead>
+                <tr><th>Environment</th><th>Owner</th><th>Trigger</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Dev Orgs</td>
+                  <td>Each developer / squad</td>
+                  <td>Manual</td>
+                  <td>Build &amp; personal unit testing</td>
+                </tr>
+                <tr>
+                  <td>INT</td>
+                  <td>Shared / Team</td>
+                  <td>Auto on Dev merge</td>
+                  <td>Continuous integration &amp; unit test</td>
+                </tr>
+                <tr>
+                  <td>E2E</td>
+                  <td>Shared / QA</td>
+                  <td>Sprint end — Release branch</td>
+                  <td>End-to-end functional testing</td>
+                </tr>
+                <tr>
+                  <td>NFT</td>
+                  <td>Shared / QA</td>
+                  <td>Sprint N+1 after E2E sign-off</td>
+                  <td>Non-functional / performance testing</td>
+                </tr>
+                <tr>
+                  <td>PROD</td>
+                  <td>Deployment Team</td>
+                  <td>Approved window</td>
+                  <td>Live production</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <div class="section-label">Key observations</div>
+            <div class="card" style="height:auto;">
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>3 shared + many personal sandboxes</strong><span>INT, E2E, and NFT are shared; each developer also maintains a personal dev sandbox independently</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>Deployments are code-push only</strong><span>Environments are updated by deploying metadata via SFDX — no sandbox seeding, cloning, or data management tooling today</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>No environment drift detection</strong><span>There is no automated check to confirm sandbox state matches the expected branch — drift is discovered at deployment time</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>Linear promotion — no parallelism</strong><span>A single release moves sequentially Dev → INT → E2E → NFT → Prod. No tooling supports parallel release streams</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">▸</div>
+                  <div class="step-text"><strong>E2E and NFT managed manually between sprints</strong><span>Promotion from E2E to NFT is a manual coordination step with no automated scheduling</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 7 — CHANGE MANAGEMENT
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="6">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Area 05 · Governance</div>
+          <div class="slide-title">Change Management <span>&amp; Governance</span></div>
+        </div>
+        <div class="slide-num">05</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="section-label" style="margin-bottom:12px;">Change management lifecycle</div>
+        <div class="flow-row" style="margin-bottom:20px; overflow-x:auto;">
+          <div class="flow-node">PR to Prod<span class="fn-sub">Triggered</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Auto SNOW CR<span class="fn-sub">Created</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Change Tasks<span class="fn-sub">Added</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Peer Review<span class="fn-sub">Sign-off</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Change Sent<span class="fn-sub">For Approval</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Approved<span class="fn-sub">CR</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Comms Sent<span class="fn-sub">Contact Centre</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlighted">Deploy Window<span class="fn-sub">Quick Deploy</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">CR Closed<span class="fn-sub">Review</span></div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="section-label">Automated steps</div>
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--green),transparent);"></div>
+              <div class="card-label">What the pipeline does automatically</div>
+              <div class="step-list" style="margin-top:8px;">
+                <div class="step-item">
+                  <div class="step-n">✓</div>
+                  <div class="step-text"><strong>SNOW Change Request creation</strong><span>CR is auto-generated when PR validation passes — no manual CR creation needed</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">✓</div>
+                  <div class="step-text"><strong>Validation &amp; test evidence email</strong><span>Test Evidence Summary is sent to approvers automatically on PR validation completion</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">✓</div>
+                  <div class="step-text"><strong>All test results stored in JET</strong><span>Apex, Jest, Selenium, Playwright, and JIRA traceability data all pushed to JET automatically</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">✓</div>
+                  <div class="step-text"><strong>Quick Deploy enabled by PR merge</strong><span>A validated PR merge enables Salesforce Quick Deploy — reducing production deployment time</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-label">Manual steps &amp; human checkpoints</div>
+            <div class="card">
+              <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),transparent);"></div>
+              <div class="card-label">What still requires human coordination</div>
+              <div class="step-list" style="margin-top:8px;">
+                <div class="step-item">
+                  <div class="step-n">!</div>
+                  <div class="step-text"><strong>Peer review of Change Task</strong><span>A separate reviewer (not the change owner) must manually review the CHG and raise concerns</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">!</div>
+                  <div class="step-text"><strong>Change approval</strong><span>Approvers review test evidence and approve the CR manually in ServiceNow</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">!</div>
+                  <div class="step-text"><strong>Deployment window coordination</strong><span>Comms team manually notifies Contact Center; deployment owner coordinates the window</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">!</div>
+                  <div class="step-text"><strong>Post-deploy steps</strong><span>Release Notes define manual post-deployment steps that must be executed by the team</span></div>
+                </div>
+                <div class="step-item">
+                  <div class="step-n">!</div>
+                  <div class="step-text"><strong>Post-deploy validation</strong><span>CR-specified validation checks run manually before the CR is moved to closed</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SLIDE 8 — SUMMARY / OBSERVATIONS
+  ════════════════════════════════════════ -->
+  <div class="slide" data-index="7">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Summary</div>
+          <div class="slide-title">Current State <span>at a Glance</span></div>
+        </div>
+        <div class="slide-num">06</div>
+      </div>
+      <div class="slide-content">
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:18px;">The following observations reflect the current state of the Salesforce delivery platform across the five reviewed areas.</p>
+
+        <div class="summary-grid">
+          <div class="obs-card">
+            <div class="obs-area">01 · Code &amp; Repository</div>
+            <ul class="obs-points">
+              <li>Self-hosted Bitbucket — all code on internal JPMC AWS infrastructure</li>
+              <li>3 separate repositories for metadata, Docker image, and shared library</li>
+              <li>No native Salesforce org-diff or org tracking tooling in use</li>
+              <li>Image versioning requires a manual promotion step via Artifactory</li>
+            </ul>
+          </div>
+          <div class="obs-card">
+            <div class="obs-area">02 · Release &amp; Branching</div>
+            <ul class="obs-points">
+              <li>Trunk-based model with sprint-boundary release cuts</li>
+              <li>One release branch per sprint — no parallel release streams</li>
+              <li>Release branch creation is a manual step at sprint end</li>
+              <li>A single release spans two sprints from cut to production</li>
+            </ul>
+          </div>
+          <div class="obs-card">
+            <div class="obs-area">03 · Deployment Pipeline</div>
+            <ul class="obs-points">
+              <li>Two triggers: PR Open (validation) and PR Merge (deploy)</li>
+              <li>All CI runs inside a Docker container via Jenkins/Cloudbees</li>
+              <li>5 quality gates enforced automatically before any deployment</li>
+              <li>Pipeline defined in Jenkinsfile using the Dynamo Shared Library</li>
+            </ul>
+          </div>
+          <div class="obs-card">
+            <div class="obs-area">04 · Environments</div>
+            <ul class="obs-points">
+              <li>3 shared sandboxes (INT, E2E, NFT) plus personal dev orgs per developer</li>
+              <li>No environment drift detection between deployments</li>
+              <li>Linear promotion — no parallel release stream support today</li>
+              <li>E2E → NFT promotion is a manual coordination step between sprints</li>
+            </ul>
+          </div>
+          <div class="obs-card" style="grid-column:1/-1;">
+            <div class="obs-area">05 · Change Management &amp; Governance</div>
+            <ul class="obs-points" style="display:grid;grid-template-columns:1fr 1fr;gap:7px 20px;">
+              <li>SNOW Change Request creation is fully automated from the CI/CD pipeline</li>
+              <li>Test evidence automatically captured in JET for every release</li>
+              <li>Peer review, change approval, and comms remain manual human checkpoints</li>
+              <li>Post-deploy steps and validation are manual tasks defined in Release Notes</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;padding:14px 18px;background:rgba(30,51,82,0.5);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;gap:12px;">
+          <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--amber);letter-spacing:0.1em;text-transform:uppercase;flex-shrink:0;">Note</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">This document reflects the current state only. It is intended to inform the leadership team's evaluation of where tooling such as Copado may add value across code management, release automation, environment management, and governance.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- end deck -->
+
+<!-- Nav bar -->
+<div class="nav-bar">
+  <div class="nav-label" id="navLabel">Salesforce Platform — Current State</div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>‹</button>
+    <div class="nav-dots" id="navDots"></div>
+    <div class="nav-counter" id="navCounter">1 / 8</div>
+    <button class="nav-btn" id="nextBtn" onclick="next()">›</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const labels = [
+    'Title — Salesforce Current State',
+    'Architecture Overview',
+    '01 · Code Storage & Repository',
+    '02 · Release Management & Branching',
+    '03 · Deployment Pipeline',
+    '04 · Environment & Sandbox Management',
+    '05 · Change Management & Governance',
+    'Summary — Current State at a Glance'
+  ];
+
+  let current = 0;
+  const total = slides.length;
+
+  const dotsEl = document.getElementById('navDots');
+  const counter = document.getElementById('navCounter');
+  const label = document.getElementById('navLabel');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function updateUI() {
+    document.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    counter.textContent = `${current + 1} / ${total}`;
+    label.textContent = labels[current];
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+  }
+
+  function goTo(idx) {
+    if (idx === current) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current].classList.remove('exit'), 450);
+    current = idx;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function next() { if (current < total - 1) goTo(current + 1); }
+  function prev() { if (current > 0) goTo(current - 1); }
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
