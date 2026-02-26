@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salesforce Deployment Lifecycle — Copado Evaluation | Confluence</title>
+<link href="https://fonts.googleapis.com/css2?family=Charlie+Display:wght@400;600;700&family=Charlie+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Confluence system font fallback ── */
+:root {
+  --cf-blue:       #0052CC;
+  --cf-blue-light: #DEEBFF;
+  --cf-blue-mid:   #0065FF;
+  --cf-text:       #172B4D;
+  --cf-sub:        #5E6C84;
+  --cf-border:     #DFE1E6;
+  --cf-bg:         #F4F5F7;
+  --cf-surface:    #FFFFFF;
+  --cf-nav:        #0747A6;
+
+  --red:           #DE350B;
+  --red-bg:        #FFEBE6;
+  --red-bd:        #FFBDAD;
+  --green:         #006644;
+  --green-bg:      #E3FCEF;
+  --green-bd:      #ABF5D1;
+  --amber:         #FF8B00;
+  --amber-bg:      #FFFAE6;
+  --amber-bd:      #FFE380;
+  --purple:        #403294;
+  --purple-bg:     #EAE6FF;
+  --purple-bd:     #C0B6F2;
+  --teal:          #00695C;
+  --teal-bg:       #E0F2F1;
+  --teal-bd:       #80CBC4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--cf-bg);
+  color: var(--cf-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  height: 56px;
+  background: var(--cf-nav);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-logo {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar-logo span {
+  background: #4C9AFF;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.topbar-nav {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+.topbar-nav a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+.topbar-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.topbar-search {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 6px 14px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.8rem;
+  width: 220px;
+}
+
+/* ── LAYOUT ── */
+.layout {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--cf-surface);
+  border-right: 1px solid var(--cf-border);
+  padding: 24px 0;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+.sidebar-space {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid var(--cf-border);
+  margin-bottom: 12px;
+}
+.sidebar-space-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cf-sub);
+  margin-bottom: 8px;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  color: var(--cf-text);
+  text-decoration: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.sidebar-item:hover { background: var(--cf-blue-light); color: var(--cf-blue); }
+.sidebar-item.active { background: var(--cf-blue-light); color: var(--cf-blue); font-weight: 500; }
+.sidebar-item .icon { font-size: 0.8rem; width: 16px; text-align: center; }
+.sidebar-section {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cf-sub);
+  padding: 12px 16px 4px;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  padding: 32px 48px 80px;
+  max-width: 1100px;
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--cf-sub);
+  margin-bottom: 20px;
+}
+.breadcrumb a { color: var(--cf-sub); text-decoration: none; }
+.breadcrumb a:hover { color: var(--cf-blue); text-decoration: underline; }
+.breadcrumb .sep { color: var(--cf-border); }
+
+/* ── PAGE HEADER ── */
+.page-header { margin-bottom: 32px; }
+
+.page-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--purple-bg);
+  border: 1px solid var(--purple-bd);
+  color: var(--purple);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cf-text);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.page-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--cf-sub);
+}
+.meta-avatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--cf-blue);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.page-divider {
+  border: none;
+  border-top: 1px solid var(--cf-border);
+  margin: 20px 0 28px;
+}
+
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.badge-red    { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+.badge-green  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+.badge-amber  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd); }
+.badge-blue   { background: var(--cf-blue-light); color: var(--cf-blue); border: 1px solid #B3D4FF; }
+.badge-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+.badge-teal   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bd); }
+
+/* ── HEADINGS ── */
+h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--cf-text);
+  margin: 36px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--cf-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+h2 .h2-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cf-text);
+  margin: 24px 0 10px;
+}
+p { margin-bottom: 12px; color: var(--cf-text); line-height: 1.65; }
+
+/* ── INFO / WARNING PANELS ── */
+.panel {
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.panel-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.panel-body { flex: 1; }
+.panel-body strong { display: block; margin-bottom: 3px; font-size: 0.88rem; }
+.panel.info    { background: var(--cf-blue-light); border-left: 4px solid var(--cf-blue); color: #0052CC; }
+.panel.warning { background: var(--amber-bg); border-left: 4px solid var(--amber); color: #7A4400; }
+.panel.error   { background: var(--red-bg); border-left: 4px solid var(--red); color: #BF2600; }
+.panel.success { background: var(--green-bg); border-left: 4px solid var(--green); color: #006644; }
+.panel.note    { background: var(--purple-bg); border-left: 4px solid var(--purple); color: var(--purple); }
+
+/* ── EXPAND SECTIONS ── */
+.expand {
+  border: 1px solid var(--cf-border);
+  border-radius: 4px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+.expand-header {
+  padding: 10px 16px;
+  background: var(--cf-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cf-text);
+  user-select: none;
+  transition: background 0.15s;
+}
+.expand-header:hover { background: var(--cf-border); }
+.expand-arrow { transition: transform 0.2s; font-size: 0.7rem; color: var(--cf-sub); }
+.expand-body {
+  padding: 16px;
+  background: var(--cf-surface);
+  border-top: 1px solid var(--cf-border);
+  display: none;
+}
+.expand.open .expand-body { display: block; }
+.expand.open .expand-arrow { transform: rotate(90deg); }
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.82rem;
+}
+th {
+  background: var(--cf-bg);
+  padding: 9px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--cf-sub);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid var(--cf-border);
+}
+td {
+  padding: 9px 14px;
+  border: 1px solid var(--cf-border);
+  vertical-align: top;
+  color: var(--cf-text);
+  line-height: 1.5;
+}
+tr:nth-child(even) td { background: #FAFBFC; }
+
+/* ── SWIMLANE ── */
+.swimlane {
+  border: 1px solid var(--cf-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 16px 0;
+  font-size: 0.78rem;
+}
+.swimlane-header {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  background: var(--cf-text);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.swimlane-header > div { padding: 10px 14px; }
+.swimlane-header > div:first-child { border-right: 1px solid rgba(255,255,255,0.15); }
+
+.swimlane-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  border-top: 1px solid var(--cf-border);
+  min-height: 72px;
+}
+.swimlane-row:nth-child(even) { background: #FAFBFC; }
+.swimlane-role {
+  padding: 12px 14px;
+  border-right: 1px solid var(--cf-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--cf-bg);
+}
+.role-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--cf-text);
+  margin-bottom: 2px;
+}
+.role-sub {
+  font-size: 0.68rem;
+  color: var(--cf-sub);
+}
+.swimlane-steps {
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.sw-step {
+  padding: 5px 11px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sw-auto   { background: var(--cf-blue-light); border-color: #B3D4FF; color: var(--cf-blue); }
+.sw-manual { background: var(--red-bg); border-color: var(--red-bd); color: var(--red); font-weight: 700; }
+.sw-gate   { background: var(--amber-bg); border-color: var(--amber-bd); color: #7A4400; }
+.sw-deploy { background: var(--green-bg); border-color: var(--green-bd); color: var(--green); font-weight: 700; }
+.sw-arr    { color: var(--cf-border); font-size: 0.75rem; flex-shrink: 0; }
+
+/* ── PROBLEM/SOLUTION CARDS ── */
+.ps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--cf-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.ps-col-head {
+  padding: 12px 18px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--cf-border);
+}
+.ps-col-head.left  { background: var(--red-bg);   color: var(--red);   border-right: 1px solid var(--cf-border); }
+.ps-col-head.right { background: var(--green-bg); color: var(--green); }
+
+.ps-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--cf-border);
+  font-size: 0.8rem;
+}
+.ps-cell {
+  padding: 14px 18px;
+  line-height: 1.5;
+  color: var(--cf-text);
+}
+.ps-cell.left  { border-right: 1px solid var(--cf-border); }
+.ps-cell strong { display: block; margin-bottom: 4px; font-size: 0.83rem; }
+.ps-cell.left strong  { color: var(--red); }
+.ps-cell.right strong { color: var(--green); }
+.ps-cell p { font-size: 0.78rem; color: var(--cf-sub); margin: 0; }
+
+/* ── RECOMMENDATION CARD ── */
+.rec-card {
+  background: linear-gradient(135deg, #0052CC 0%, #0747A6 100%);
+  border-radius: 8px;
+  padding: 28px 32px;
+  margin: 16px 0;
+  color: #fff;
+}
+.rec-card h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rec-card p {
+  color: rgba(255,255,255,0.88);
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+.rec-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.rec-step {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  padding: 14px;
+}
+.rec-step-num {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #4C9AFF;
+  margin-bottom: 5px;
+  font-family: Georgia, serif;
+}
+.rec-step-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.rec-step-body {
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.45;
+}
+
+/* ── STATS ROW ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+.stat-card {
+  background: var(--cf-surface);
+  border: 1px solid var(--cf-border);
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+  font-family: Georgia, serif;
+}
+.stat-lbl {
+  font-size: 0.7rem;
+  color: var(--cf-sub);
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stat-card.red    .stat-val { color: var(--red); }
+.stat-card.amber  .stat-val { color: var(--amber); }
+.stat-card.green  .stat-val { color: var(--green); }
+.stat-card.blue   .stat-val { color: var(--cf-blue); }
+
+/* ── TOC ── */
+.toc {
+  background: var(--cf-bg);
+  border: 1px solid var(--cf-border);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin: 0 0 28px;
+  font-size: 0.8rem;
+}
+.toc-title {
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--cf-sub);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.toc ol { padding-left: 18px; }
+.toc li { margin-bottom: 4px; }
+.toc a  { color: var(--cf-blue); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ── PRINT ── */
+@media print {
+  .topbar, .sidebar { display: none; }
+  .main { padding: 20px; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    ◈ <span>CONFLUENCE</span>
+  </div>
+  <nav class="topbar-nav">
+    <a href="#">Spaces</a>
+    <a href="#">Pages</a>
+    <a href="#">People</a>
+    <a href="#">Templates</a>
+  </nav>
+  <input class="topbar-search" placeholder="🔍  Search Confluence" readonly/>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-space">
+      <div class="sidebar-space-name">Dynamo Salesforce</div>
+    </div>
+    <div class="sidebar-section">Platform Documentation</div>
+    <a class="sidebar-item" href="#">
+      <span class="icon">🏠</span> Space Home
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="icon">📋</span> CI/CD Overview
+    </a>
+    <a class="sidebar-item active" href="#">
+      <span class="icon">🔄</span> Deployment Lifecycle
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="icon">🧪</span> Testing Strategy
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="icon">🔒</span> Change Management
+    </a>
+    <div class="sidebar-section">Evaluation</div>
+    <a class="sidebar-item" href="#">
+      <span class="icon">⚖️</span> Copado Assessment
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="icon">📊</span> Gap Analysis
+    </a>
+    <div class="sidebar-section">On This Page</div>
+    <a class="sidebar-item" href="#overview" style="font-size:0.75rem;padding:4px 16px;">Overview</a>
+    <a class="sidebar-item" href="#pipeline" style="font-size:0.75rem;padding:4px 16px;">Pipeline Flow</a>
+    <a class="sidebar-item" href="#manual" style="font-size:0.75rem;padding:4px 16px;">Manual Steps</a>
+    <a class="sidebar-item" href="#problems" style="font-size:0.75rem;padding:4px 16px;">Problems</a>
+    <a class="sidebar-item" href="#copado" style="font-size:0.75rem;padding:4px 16px;">Copado Opportunity</a>
+    <a class="sidebar-item" href="#recommendation" style="font-size:0.75rem;padding:4px 16px;">Recommendation</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <a href="#">Dynamo Salesforce</a>
+      <span class="sep">›</span>
+      <a href="#">Platform Documentation</a>
+      <span class="sep">›</span>
+      <span>Salesforce Deployment Lifecycle — Copado Evaluation</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-label">🔍 Evaluation Document</div>
+      <h1 class="page-title">Salesforce Deployment Lifecycle<br>— Copado Evaluation</h1>
+      <div class="page-meta">
+        <div class="meta-item">
+          <div class="meta-avatar">DV</div>
+          <span>Created by <strong>Dynamo V2 Salesforce</strong></span>
+        </div>
+        <div class="meta-item">📅 February 2026</div>
+        <div class="meta-item"><span class="badge badge-amber">In Review</span></div>
+        <div class="meta-item"><span class="badge badge-purple">Manager Review</span></div>
+      </div>
+    </div>
+    <hr class="page-divider"/>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+      <div class="toc-title">📋 Contents</div>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#pipeline">Current State — Pipeline Flow with Manual Steps</a></li>
+        <li><a href="#manual">Manual Steps — Risk Register</a></li>
+        <li><a href="#problems">Problems with the Current Approach</a></li>
+        <li><a href="#copado">Copado Opportunity</a></li>
+        <li><a href="#recommendation">Recommendation</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         1. OVERVIEW
+    ═══════════════════════════════════════ -->
+    <h2 id="overview">
+      <span class="h2-icon" style="background:#DEEBFF;">📌</span>
+      Overview
+    </h2>
+
+    <p>This page documents the current Salesforce deployment lifecycle for the <strong>Dynamo V2 Salesforce</strong> team, identifies where manual steps introduce risk and delay, and evaluates how <strong>Copado</strong> could address those gaps.</p>
+
+    <div class="panel info">
+      <div class="panel-icon">ℹ️</div>
+      <div class="panel-body">
+        <strong>Scope</strong>
+        This document covers the full delivery lifecycle — from a developer raising a Pull Request through to production deployment and Change Request closure. It does not cover individual development practices or sprint ceremonies.
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card blue">
+        <div class="stat-val">5</div>
+        <div class="stat-lbl">Pipeline phases</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-val">11</div>
+        <div class="stat-lbl">Manual steps identified</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-val">5</div>
+        <div class="stat-lbl">High-risk manual steps</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val">8</div>
+        <div class="stat-lbl">Copado opportunities</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         2. PIPELINE FLOW (SWIMLANE)
+    ═══════════════════════════════════════ -->
+    <h2 id="pipeline">
+      <span class="h2-icon" style="background:#E3FCEF;">🔄</span>
+      Current State — Pipeline Flow with Manual Steps
+    </h2>
+
+    <p>The swimlane below shows the full deployment lifecycle mapped by role. <span class="badge badge-red">⚠ Manual</span> steps are highlighted in red — these are the points where the pipeline depends on human action, coordination, or judgment rather than automation.</p>
+
+    <div class="swimlane">
+      <div class="swimlane-header">
+        <div>Role</div>
+        <div>Steps in Deployment Lifecycle</div>
+      </div>
+
+      <!-- Developer row -->
+      <div class="swimlane-row">
+        <div class="swimlane-role">
+          <div class="role-name">👩‍💻 Developer</div>
+          <div class="role-sub">Raises PRs, reviews CI</div>
+        </div>
+        <div class="swimlane-steps">
+          <div class="sw-step sw-auto">Works in Dev Sandbox</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Raises PR to Dev branch</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-gate">⬦ Automated CI checks</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">PR merged → INT deploy</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Manual release branch cut</div>
+        </div>
+      </div>
+
+      <!-- Jenkins/CI row -->
+      <div class="swimlane-row">
+        <div class="swimlane-role">
+          <div class="role-name">⚙️ CI Pipeline</div>
+          <div class="role-sub">Jenkins · Docker · SFDX</div>
+        </div>
+        <div class="swimlane-steps">
+          <div class="sw-step sw-auto">Apex Tests ≥75%</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Jest Tests</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">SSAP Scan</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">SonarQube Upload</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">SF Validation</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Store results in JET</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Auto-create SNOW CR</div>
+        </div>
+      </div>
+
+      <!-- QA row -->
+      <div class="swimlane-row">
+        <div class="swimlane-role">
+          <div class="role-name">🧪 QA Engineer</div>
+          <div class="role-sub">E2E · NFT · Regression</div>
+        </div>
+        <div class="swimlane-steps">
+          <div class="sw-step sw-auto">Deploy to E2E Org</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">E2E Testing</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Manual E2E→NFT promotion</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Selenium ≥90% / Playwright ≥90%</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Manual test exit sign-off</div>
+        </div>
+      </div>
+
+      <!-- Release Manager row -->
+      <div class="swimlane-row">
+        <div class="swimlane-role">
+          <div class="role-name">📋 Release Manager</div>
+          <div class="role-sub">CR · Approval · Comms</div>
+        </div>
+        <div class="swimlane-steps">
+          <div class="sw-step sw-auto">Raise PR to Prod branch</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Peer review Change Task</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Change approval (SNOW)</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Send deployment comms</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-deploy">✓ Quick Deploy to PROD</div>
+        </div>
+      </div>
+
+      <!-- Post-deploy row -->
+      <div class="swimlane-row">
+        <div class="swimlane-role">
+          <div class="role-name">🚀 Deployment Team</div>
+          <div class="role-sub">Post-deploy · CR close</div>
+        </div>
+        <div class="swimlane-steps">
+          <div class="sw-step sw-auto">PR Reviewed &amp; Merged</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">Enable Quick Deploy</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-deploy">✓ Quick Deploy to Production</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Manual post-deploy steps</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-manual">⚠ Manual post-deploy validation</div>
+          <div class="sw-arr">→</div>
+          <div class="sw-step sw-auto">CR moved to Closed</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;padding:10px 14px;background:var(--cf-bg);border-radius:4px;border:1px solid var(--cf-border);">
+      <span style="font-size:0.72rem;font-weight:700;color:var(--cf-sub);text-transform:uppercase;letter-spacing:0.06em;align-self:center;">Legend:</span>
+      <div style="display:flex;align-items:center;gap:5px;font-size:0.75rem;"><div style="width:12px;height:12px;background:var(--cf-blue-light);border:1px solid #B3D4FF;border-radius:2px;"></div> Automated step</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:0.75rem;"><div style="width:12px;height:12px;background:var(--red-bg);border:1px solid var(--red-bd);border-radius:2px;"></div> ⚠ Manual step</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:0.75rem;"><div style="width:12px;height:12px;background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:2px;"></div> Decision gate</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:0.75rem;"><div style="width:12px;height:12px;background:var(--green-bg);border:1px solid var(--green-bd);border-radius:2px;"></div> Key deployment action</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         3. MANUAL STEPS RISK REGISTER
+    ═══════════════════════════════════════ -->
+    <h2 id="manual">
+      <span class="h2-icon" style="background:#FFEBE6;">⚠️</span>
+      Manual Steps — Risk Register
+    </h2>
+
+    <p>The following table lists all 11 manual steps identified in the current pipeline, with the risk each step introduces if delayed, missed, or performed incorrectly.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Manual Step</th>
+          <th>Phase</th>
+          <th>Risk</th>
+          <th>Impact if Missed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>Release branch cut from Dev</strong></td>
+          <td>Release</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Entire release delayed by one full sprint</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>E2E → NFT environment promotion</strong></td>
+          <td>Testing</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>NFT window missed; release pushed to next sprint</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Test exit report sign-off</strong></td>
+          <td>Testing</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>PR to Prod cannot be raised; release stalls</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Peer review of Change Task</strong></td>
+          <td>Governance</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>Inconsistent reviews; compliance gaps not caught</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Change approval in ServiceNow</strong></td>
+          <td>Governance</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Deployment window missed if approver unavailable</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><strong>Deployment comms to Contact Centre</strong></td>
+          <td>Deployment</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>Contact Centre unprepared; operational disruption</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td><strong>Post-deployment steps (Release Notes)</strong></td>
+          <td>Deployment</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Steps missed silently; no audit trail; prod issues</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td><strong>Post-deployment validation</strong></td>
+          <td>Deployment</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Issues not caught post-deploy; CR closed incorrectly</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td><strong>Docker image promotion (Artifactory)</strong></td>
+          <td>Infrastructure</td>
+          <td><span class="badge badge-amber">Medium</span></td>
+          <td>Stale image used in CI; test results unreliable</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td><strong>sfdx-app.yaml version update</strong></td>
+          <td>Infrastructure</td>
+          <td><span class="badge badge-blue">Low</span></td>
+          <td>Pipeline uses wrong image version until corrected</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td><strong>No org drift detection</strong></td>
+          <td>All phases</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Deployment failures discovered at deploy time not before</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="panel warning">
+      <div class="panel-icon">⚠️</div>
+      <div class="panel-body">
+        <strong>5 of the 11 manual steps are on the critical path to production.</strong>
+        A delay or error in any one of steps 1, 2, 5, 7, or 8 directly blocks the release or causes a production incident. These are the highest-priority items for automation.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         4. PROBLEMS
+    ═══════════════════════════════════════ -->
+    <h2 id="problems">
+      <span class="h2-icon" style="background:#FFEBE6;">🔍</span>
+      Problems with the Current Approach
+    </h2>
+
+    <p>Beyond individual manual steps, the current pipeline has four systemic problems that affect the team's ability to release safely and quickly.</p>
+
+    <div class="expand open">
+      <div class="expand-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="expand-arrow">▶</span>
+        <span>Problem 1 — A single release takes two full sprints from cut to production</span>
+        <span class="badge badge-red" style="margin-left:auto;">High Impact</span>
+      </div>
+      <div class="expand-body">
+        <p>E2E testing happens in sprint N. NFT testing and production deployment happen in sprint N+1. This means every release is at least two sprints long — roughly 4 weeks. A bug found in NFT forces a fix into the <em>following</em> sprint, extending to 3 sprints. There is no ability to run parallel release streams, so a late release blocks everything behind it.</p>
+        <table>
+          <tr><th>Today</th><th>Impact</th></tr>
+          <tr><td>Sprint N — E2E testing</td><td>Code frozen 2 weeks before production</td></tr>
+          <tr><td>Sprint N+1 — NFT + Production</td><td>Total cycle: 4–6 weeks from dev to prod</td></tr>
+          <tr><td>No parallel pipelines</td><td>One blocked release blocks all subsequent releases</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="expand">
+      <div class="expand-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="expand-arrow">▶</span>
+        <span>Problem 2 — No environment drift detection; failures discovered at deploy time</span>
+        <span class="badge badge-red" style="margin-left:auto;">High Impact</span>
+      </div>
+      <div class="expand-body">
+        <p>There is no automated check to confirm that a target sandbox (E2E, NFT, or Prod) is in the expected state before deploying. If a sandbox has been manually modified, or a previous failed deployment left it in a partial state, this is only discovered when the next deployment fails — wasting the deployment window and requiring a rollback.</p>
+      </div>
+    </div>
+
+    <div class="expand">
+      <div class="expand-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="expand-arrow">▶</span>
+        <span>Problem 3 — Test evidence is fragmented across JET, JIRA, and manual documents</span>
+        <span class="badge badge-amber" style="margin-left:auto;">Medium Impact</span>
+      </div>
+      <div class="expand-body">
+        <p>Apex and Jest results are stored in JET. JIRA holds test case traceability. Selenium and Playwright results live in the CI pipeline. Test exit reports are manually authored Word or Confluence documents. Change approvers must cross-reference all four sources to make an informed approval decision — introducing delays and the risk of approving with incomplete evidence.</p>
+      </div>
+    </div>
+
+    <div class="expand">
+      <div class="expand-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="expand-arrow">▶</span>
+        <span>Problem 4 — Pipeline toolchain requires a separate Docker + Shared Library + Artifactory maintenance track</span>
+        <span class="badge badge-amber" style="margin-left:auto;">Medium Impact</span>
+      </div>
+      <div class="expand-body">
+        <p>The CI/CD capability depends on a Docker image, an Artifactory pipeline, and a shared library that all need to be maintained independently of the Salesforce codebase. Image updates require a manual promotion step and a manual sfdx-app.yaml version bump. This is operational overhead that does not exist in a Salesforce-native DevOps platform.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         5. COPADO OPPORTUNITY
+    ═══════════════════════════════════════ -->
+    <h2 id="copado">
+      <span class="h2-icon" style="background:#E3FCEF;">✨</span>
+      Copado Opportunity
+    </h2>
+
+    <p>The table below maps each current problem directly to the Copado capability that addresses it. This is not a recommendation to adopt Copado — it is an objective mapping to help the team evaluate fit.</p>
+
+    <div class="ps-grid">
+      <div style="display:contents;">
+        <div class="ps-col-head left">✕ Current Problem</div>
+        <div class="ps-col-head right">✓ Copado Capability</div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Manual release branch cut at sprint end</strong>
+          <p>Missed or delayed cuts push entire releases by a sprint. No tooling enforces or triggers the cut.</p>
+          <span class="badge badge-red" style="margin-top:6px;">High Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Pipelines — automated promotion</strong>
+          <p>Promotion between environments is a defined pipeline step. Triggered automatically or with a single click — no manual branch management required.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Pipelines</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>No org drift detection before deployments</strong>
+          <p>Sandbox state not verified before deploying. Drift and failures discovered at deployment time only.</p>
+          <span class="badge badge-red" style="margin-top:6px;">High Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Org Difference — pre-deployment diff</strong>
+          <p>Automatically compares source and target org state before every promotion. Catches drift before deployment, not after.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Org Diff</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Manual peer review and change approval — no enforcement</strong>
+          <p>No structured checklist. Approval delays block deployment windows. Inconsistent review quality across releases.</p>
+          <span class="badge badge-red" style="margin-top:6px;">High Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Compliance Hub — structured approval gates</strong>
+          <p>Compliance rules and checklists defined once, enforced consistently on every release. Gates are pipeline steps, not ad-hoc manual tasks.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Compliance Hub</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Manual post-deployment steps with no audit trail</strong>
+          <p>Steps defined in Release Notes documents. No automated execution, verification, or evidence capture linked to the CR.</p>
+          <span class="badge badge-red" style="margin-top:6px;">High Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Functions — versioned, logged pipeline steps</strong>
+          <p>Post-deploy steps become versioned, repeatable pipeline functions. Every execution is logged and automatically linked to the deployment record.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Functions</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Test evidence fragmented across 4 separate systems</strong>
+          <p>Approvers cross-reference JET, JIRA, CI pipeline, and manual reports to make an approval decision. Slow and error-prone.</p>
+          <span class="badge badge-amber" style="margin-top:6px;">Medium Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Testing — unified evidence per deployment</strong>
+          <p>All test results, traceability, and evidence consolidated in one record per deployment. Approvers see everything in one place.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Testing</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Two-sprint release cycle with no parallel streams</strong>
+          <p>Code frozen for up to 6 weeks before production. One blocked release blocks all subsequent releases behind it.</p>
+          <span class="badge badge-amber" style="margin-top:6px;">Medium Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado Pipelines — parallel pipelines and faster promotion</strong>
+          <p>Multiple parallel release pipelines supported natively. Automated promotions and quality gates reduce cycle time without reducing governance.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado Pipelines</span>
+        </div>
+      </div>
+
+      <div class="ps-row">
+        <div class="ps-cell left">
+          <strong>Separate Docker + Artifactory + Shared Library maintenance track</strong>
+          <p>Three additional repos and a separate maintenance pipeline not related to Salesforce features — ongoing operational overhead.</p>
+          <span class="badge badge-blue" style="margin-top:6px;">Low Risk</span>
+        </div>
+        <div class="ps-cell right">
+          <strong>Copado DX — Salesforce-native pipeline, no Docker needed</strong>
+          <p>Copado manages Salesforce metadata, versioning, and deployments natively. The separate Docker image and shared library toolchain is no longer required.</p>
+          <span class="badge badge-teal" style="margin-top:6px;">Copado DX</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         6. RECOMMENDATION
+    ═══════════════════════════════════════ -->
+    <h2 id="recommendation">
+      <span class="h2-icon" style="background:#DEEBFF;">🎯</span>
+      Recommendation
+    </h2>
+
+    <p>Based on the analysis above, the team recommends <strong>initiating a Copado proof-of-concept</strong> focused on the three highest-impact, lowest-effort improvements. A full platform migration is not proposed at this stage.</p>
+
+    <div class="rec-card">
+      <h3>🎯 Recommended Approach — Phased Adoption</h3>
+      <p>Start with the three quick wins that directly address the highest-risk manual steps on the critical path to production. Evaluate results before committing to a full platform migration.</p>
+      <div class="rec-steps">
+        <div class="rec-step">
+          <div class="rec-step-num">01</div>
+          <div class="rec-step-title">Proof of Concept</div>
+          <div class="rec-step-body">Automate environment promotion (E2E → NFT → Prod) and org drift detection in an isolated PoC environment. Measure impact on release cycle time.</div>
+        </div>
+        <div class="rec-step">
+          <div class="rec-step-num">02</div>
+          <div class="rec-step-title">Governance Integration</div>
+          <div class="rec-step-body">Replace manual peer review and CR approval with Copado Compliance Hub gates. Integrate with existing ServiceNow change management workflow.</div>
+        </div>
+        <div class="rec-step">
+          <div class="rec-step-num">03</div>
+          <div class="rec-step-title">Full Pipeline Migration</div>
+          <div class="rec-step-body">Based on PoC results, evaluate full migration from Jenkins/Docker/Shared Library to Copado DX. Consolidate test evidence with Copado Testing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel note">
+      <div class="panel-icon">📝</div>
+      <div class="panel-body">
+        <strong>Note on existing toolchain</strong>
+        This recommendation does not require an immediate full migration. The existing GitHub, Jenkins, and Docker pipeline can run in parallel with Copado during the PoC phase, reducing risk and allowing a controlled evaluation against real release cycles.
+      </div>
+    </div>
+
+    <h3>Items Outside Scope of This Recommendation</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Reason for Exclusion</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Replacing ServiceNow with Copado CR management</td>
+          <td>SNOW is a bank-wide ITSM platform — out of scope for a team-level decision</td>
+        </tr>
+        <tr>
+          <td>Migrating from GitHub to Copado SCM</td>
+          <td>GitHub is the recently adopted standard — no business case to change</td>
+        </tr>
+        <tr>
+          <td>Automating change approval sign-off</td>
+          <td>Human approval required by bank governance policy — cannot be removed</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:40px;padding:16px 20px;background:var(--cf-bg);border:1px solid var(--cf-border);border-radius:4px;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--cf-sub);">
+      <span>📄 Dynamo V2 Salesforce · Platform Documentation</span>
+      <span>Last updated: February 2026 · Status: <span class="badge badge-amber">In Review</span></span>
+      <span>Related: <a href="#" style="color:var(--cf-blue);">CI/CD Overview</a> · <a href="#" style="color:var(--cf-blue);">Gap Analysis</a></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Smooth scroll for TOC and sidebar links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+</body>
+</html>
