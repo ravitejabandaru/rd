@@ -1,0 +1,843 @@
+<ac:structured-macro ac:name="info">
+  <ac:parameter ac:name="title">Salesforce SDLC — Current State → Target State</ac:parameter>
+  <ac:rich-text-body>
+    <p><strong>Team:</strong> Dynamo-V2-Salesforce &nbsp;|&nbsp; <strong>Platform Owner:</strong> DevX Automation Team &nbsp;|&nbsp; <strong>Migration:</strong> Cloudbees + Jenkins → Copado</p>
+    <p>This page documents the end-to-end Salesforce SDLC — how we build and deploy today using Cloudbees + Jenkins, and where we are going with Copado. It covers the full developer workflow, quality gates, JIRA and ServiceNow integrations, the Release Readiness Check pipeline, toolchain changes, and a prioritised migration roadmap.</p>
+    <table>
+      <tbody>
+        <tr>
+          <th><strong>Stat</strong></th>
+          <th><strong>Value</strong></th>
+        </tr>
+        <tr>
+          <td>Manual steps in current pipeline</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">11 Manual Steps</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Remain manual in target state</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">~4 Manual Steps</ac:parameter></ac:structured-macro></td>
+        </tr>
+        <tr>
+          <td>Environments</td>
+          <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">5 Envs: CI · INT · E2E · NFT · Prod</ac:parameter></ac:structured-macro></td>
+        </tr>
+      </tbody>
+    </table>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Legend</h2>
+<table>
+  <tbody>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Automated Step</ac:parameter></ac:structured-macro></td>
+      <td>Step runs automatically — no human action required</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual Step</ac:parameter></ac:structured-macro></td>
+      <td>Human action required — risk point in current pipeline</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado</ac:parameter></ac:structured-macro></td>
+      <td>Copado-orchestrated step (target state — migrated or new)</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">○ Decision / Gap</ac:parameter></ac:structured-macro></td>
+      <td>Decision point, gap, or missing capability</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 1 — Current State Pipeline</h1>
+<p>Current pipeline using Cloudbees + Jenkins. Manual steps are highlighted in red and represent the primary risk and automation opportunities.</p>
+
+<h2>Phase 1 — Development &amp; CI</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Phase</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Phase 1</strong><br/>Development &amp; CI</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Pick JIRA story → create branch (name = JIRA ticket #)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Build in sandbox → commit &amp; raise PR to Dev</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Jenkins webhook fires → SGD identifies changed components</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Dry-run validation (Dev sandbox)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Apex (≥75% cov · 100% pass) · Jest (≥35% / ≥70% Dynamo)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">SonarQube upload</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ 2 GitHub approvers required</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">PR merged → auto-deploy to CI + INT</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Phase 2 — Release &amp; Branching</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Path</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Standard</strong><br/><em>(sprint end)</em></td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Sprint end → release branch cut</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Deploy to E2E sandbox</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Playwright E2E regression (≥80% pass rate)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual E2E → NFT promotion</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">NFT regression (≥80% pass rate)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual test exit sign-off</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Fast-Forward</strong><br/><em>(on demand)</em></td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Raise PR directly to release branch (→ E2E sandbox)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">E2E validation runs with all test classes</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ 2 GitHub approvers</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Merge → deploy to E2E</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<ac:structured-macro ac:name="note">
+  <ac:parameter ac:name="title">Phase 2.5 — Release Readiness Check (Standalone Jenkins Feedback Pipeline — No Deployment)</ac:parameter>
+  <ac:rich-text-body>
+    <p>This is a <strong>separate Jenkins job</strong> triggered manually by the release manager before NFT or Production deployments. It validates release readiness by running all quality gates against the release branch <strong>without deploying anything</strong>. Build is marked <strong>UNSTABLE</strong> (not failed) if any control fails — giving visibility without blocking.</p>
+    <p><strong>Parameters:</strong> <code>TARGET_ORG</code> (NFT or Prod) · <code>releaseVersion</code> (e.g. 263.0) · <code>delta</code> (true/false) · run flags below</p>
+    <table>
+      <tbody>
+        <tr>
+          <th><strong>Control</strong></th>
+          <th><strong>Flag</strong></th>
+          <th><strong>Checks</strong></th>
+        </tr>
+        <tr>
+          <td><strong>Unit Testing</strong></td>
+          <td><code>runUnitTest</code></td>
+          <td>Apex code coverage ≥ 75% · Apex unit test pass rate = 100% · Jest overall coverage ≥ 35% · Jest Dynamo components ≥ 70%</td>
+        </tr>
+        <tr>
+          <td><strong>Security</strong></td>
+          <td><code>runSSAPScan</code></td>
+          <td>SSAP vulnerability scan</td>
+        </tr>
+        <tr>
+          <td><strong>Functional Testing</strong></td>
+          <td><code>runAutomatedFunctionalTests</code></td>
+          <td>Playwright regression / smoke tests ≥ 80% pass rate</td>
+        </tr>
+        <tr>
+          <td><strong>Traceability</strong></td>
+          <td><code>runTestTraceability</code></td>
+          <td>All requirements mapped to tests · All mapped tests executed and passed (100%) · No open High/Critical priority bugs · No open Low/Medium priority bugs · No defects in Triage · No production defects outside SLA · Manual regression test pass rate = 100%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Outcome:</strong>
+      <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">UNSTABLE if any control fails</ac:parameter></ac:structured-macro>
+      — Sends detailed PASS/FAIL email per control to the release manager.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Phase 3 — Production PR &amp; Validation</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Phase</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Phase 3</strong><br/>Production PR &amp; Validation</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Raise PR to Prod branch</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">5 parallel CI checks (dry-run)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">SSAP security scan</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Test traceability check</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Open bug / SLA validation</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">JET IDs linked to commit hash</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Auto-create SNOW CR</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual peer review of CR</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual change approval (SNOW)</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Phase 4</strong><br/>Deployment</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual comms to Contact Centre</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">PR merged → Quick Deploy (pre-validated metadata)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Git tag created for release</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Email QC report with deployment evidence</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual post-deploy steps (Release Notes)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual post-deploy validation</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">CR closed</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Phase 5</strong><br/>Infrastructure &amp; Toolchain</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Docker + SFDX CLI (JWT auth per org)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual Docker image promotion (Artifactory)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Manual sfdx-app.yaml version update</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Dynamo Shared Library → Jenkinsfile</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">○ No org-diff / drift detection</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 2 — Current JIRA &amp; ServiceNow Integrations</h1>
+<p>How JIRA and ServiceNow connect to the pipeline today — what works, what is manual, and what gaps exist.</p>
+
+<table>
+  <colgroup>
+    <col style="width: 50%;" />
+    <col style="width: 50%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>JIRA Today</strong> — Test management &amp; sprint tracking</th>
+      <th><strong>ServiceNow (SNOW) Today</strong> — Change request lifecycle</th>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>Sprint stories tracked manually</strong></p>
+        <p>JIRA boards manage sprint stories but there is no automated link between a JIRA ticket and the code changes (PR / commit) that deliver it. Developers include ticket IDs in branch names and commit messages by convention — no platform enforcement.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Convention</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>SNOW CR auto-created by pipeline</strong> ✓</p>
+        <p>When a PR is raised to the Prod branch, the Jenkins pipeline automatically creates a ServiceNow Change Request. This is the most mature automation in the current pipeline. JET IDs are linked to the commit hash at this stage.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Automated</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>No automated deployment status update</strong></p>
+        <p>After a feature is deployed to production, the JIRA story status must be updated manually by the developer or release manager. No pipeline event triggers a JIRA status change.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Update</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>Peer review and approval are manual</strong></p>
+        <p>Despite the CR being auto-created, the peer review of the Change Task and the final change approval in SNOW are both manual checkpoints. Bottlenecks here block the deployment window.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Checkpoint</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>Test evidence compiled manually</strong></p>
+        <p>Test results live in JET, test cases in JIRA, and regression results in the pipeline log. The test exit report must be manually assembled from multiple sources. No single traceability chain from story to evidence.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Assembly</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>CR status not a hard pipeline gate</strong></p>
+        <p>The pipeline does not wait for SNOW CR approval before allowing deployment to proceed. This depends on the team manually checking the CR status before merging the Prod PR — no hard gate exists.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Gap — No Gate</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 3 — Target State Pipeline</h1>
+<p>The same 5 phases — with Copado as the CI/CD orchestrator replacing Cloudbees + Jenkins. DevX Automation Team owns and configures all Copado pipelines and integrations.</p>
+
+<h2>Phase 1 — Development &amp; CI (Copado)</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Phase</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Phase 1</strong><br/>Development &amp; CI</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ JIRA story → Copado User Story (enforced link)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Dev Org (Copado managed sandbox)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Raise PR to Dev (JIRA ticket # as branch)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado CI Stage → SGD delta identification</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Dry-run · Apex (≥75% / 100% pass) · Jest (≥35% / ≥70% Dynamo)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">SonarQube · test traceability check</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ 2 GitHub approvers → Copado gates merge</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Merged → auto-deploy CI + INT (Copado)</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Phase 2 — Release &amp; Branching (Copado)</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Path</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Standard</strong><br/><em>(sprint end)</em></td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Sprint end → Copado auto-cuts release branch</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Deploy → E2E (Copado gate)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Playwright E2E regression (≥80% pass rate)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Gate ≥90% → auto-promote to NFT</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">NFT regression (≥80% pass rate)</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Fast-Forward</strong><br/><em>(on demand)</em></td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ PR to release branch → Copado E2E validation stage</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Full test suite · 2 approvers</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Merge → Copado deploys to E2E</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<ac:structured-macro ac:name="tip">
+  <ac:parameter ac:name="title">Phase 2.5 — Release Readiness Check (Copado Pipeline Stage — No Deployment)</ac:parameter>
+  <ac:rich-text-body>
+    <p>In the target state, this standalone feedback check becomes a <strong>native Copado Pipeline Stage</strong> — same parameterized controls, but managed and triggered through Copado. Feedback reports are delivered via Copado's native notification system rather than a separate Jenkins email job.</p>
+    <table>
+      <tbody>
+        <tr>
+          <th><strong>Control</strong></th>
+          <th><strong>Flag</strong></th>
+          <th><strong>Gate</strong></th>
+        </tr>
+        <tr>
+          <td>Unit Testing</td>
+          <td><code>runUnitTest</code></td>
+          <td>Apex ≥75% / 100% pass · Jest ≥35% / ≥70% Dynamo</td>
+        </tr>
+        <tr>
+          <td>Security</td>
+          <td><code>runSSAPScan</code></td>
+          <td>SSAP vulnerability scan — no V1/V2 issues</td>
+        </tr>
+        <tr>
+          <td>Functional Testing</td>
+          <td><code>runAutomatedFunctionalTests</code></td>
+          <td>Playwright ≥80% pass rate</td>
+        </tr>
+        <tr>
+          <td>Traceability</td>
+          <td><code>runTestTraceability</code></td>
+          <td>All reqs mapped · 100% pass · no open bugs · no SLA breach · manual regression 100%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Outcome:</strong>
+      <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">UNSTABLE if any control fails</ac:parameter></ac:structured-macro>
+      — Copado sends PASS/FAIL per control to release manager. No deployment occurs.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Phases 3–5 (Copado)</h2>
+<table>
+  <colgroup>
+    <col style="width: 16%;" />
+    <col style="width: 84%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Phase</strong></th>
+      <th><strong>Steps</strong></th>
+    </tr>
+    <tr>
+      <td><strong>Phase 3</strong><br/>Production PR &amp; Validation</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado Prod stage (5 checks, dry-run)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ SSAP security scan (prod only)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Test traceability · open bug / SLA validation</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ JET evidence auto-linked to commit hash</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ SNOW CR auto-created (Copado native)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ CR approval gates the pipeline</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Peer review (intentional human gate)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Change approval (SNOW)</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Phase 4</strong><br/>Deployment</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ CR approved → unblocks Copado pipeline</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado deploys (pre-validated metadata)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Git tag auto-created for release</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Email QC report (automated)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Event-driven comms to Contact Centre</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Post-deploy steps (Release Notes)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">⚠ Post-deploy validation</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ SNOW CR auto-closed</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Phase 5</strong><br/>Infrastructure &amp; Toolchain</td>
+      <td>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado native SF deploy engine (no Docker)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ JWT auth managed by Copado Environment Manager</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado Pipeline Templates (DevX owned)</ac:parameter></ac:structured-macro>
+        →
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Org drift monitoring — continuous</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 4 — Target JIRA &amp; ServiceNow Integrations</h1>
+<p>How Copado (owned and configured by the DevX Automation Team) resolves every current gap in JIRA and ServiceNow integration.</p>
+
+<table>
+  <colgroup>
+    <col style="width: 50%;" />
+    <col style="width: 50%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Current Problem</strong></th>
+      <th><strong>Copado Target Solution</strong></th>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>JIRA · Gap 1 — No enforced PR → JIRA story link</strong></p>
+        <p>Commit messages and branch names reference JIRA IDs by team convention only. No tooling enforces the link, validates the ID, or auto-attaches the commit to a user story. Traceability depends entirely on developer discipline.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Convention</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>JIRA · Solution 1 — Bidirectional User Story sync</strong></p>
+        <p>JIRA stories sync to Copado User Story objects via native integration configured by DevX. PRs and commits are automatically associated to the relevant story. The link is enforced by the platform — not convention.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Copado Native Sync</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>JIRA · Gap 2 — No auto status update on deployment</strong></p>
+        <p>After a story is deployed to production, the JIRA ticket must be manually updated. No pipeline event triggers a status change — leading to stale story states and inaccurate sprint reporting.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Update</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>JIRA · Solution 2 — Deploy triggers automatic status update</strong></p>
+        <p>When a Copado User Story is promoted to Production, the linked JIRA ticket is automatically moved to Done. No developer action required — sprint reporting is always accurate.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Event-Driven Automation</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>SNOW · Gap 1 — CR approval is not a hard pipeline gate</strong></p>
+        <p>The pipeline auto-creates the SNOW CR, but does not enforce that approval must be granted before deployment. This relies on the team manually coordinating — which breaks down under time pressure.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Missing Gate</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>SNOW · Solution 1 — CR approval unblocks the pipeline</strong></p>
+        <p>Copado's native ServiceNow integration polls the CR status. The deployment pipeline is blocked until the CR reaches Approved in SNOW. No manual coordination needed — the system enforces the gate automatically.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Hard Pipeline Gate</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p><strong>SNOW · Gap 2 — Manual CR close after deployment</strong></p>
+        <p>After a successful production deployment, the release manager must manually return to ServiceNow and move the Change Request through Review to Closed. No automation, no deadline enforcement.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Manual Closure</ac:parameter></ac:structured-macro>
+      </td>
+      <td>
+        <p><strong>SNOW · Solution 2 — Copado auto-closes the CR on success</strong></p>
+        <p>When Copado registers a successful production deployment, it automatically updates the SNOW CR to Closed via the native integration. The full CR lifecycle — create, gate, close — is managed by Copado without manual intervention.</p>
+        <ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">◆ Full Lifecycle Automation</ac:parameter></ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 5 — Toolchain Delta</h1>
+<p>What changes, what stays, and what is new when migrating from Cloudbees + Jenkins to Copado. All changes are owned and implemented by the DevX Automation Team.</p>
+
+<table>
+  <colgroup>
+    <col style="width: 18%;" />
+    <col style="width: 28%;" />
+    <col style="width: 28%;" />
+    <col style="width: 14%;" />
+    <col style="width: 12%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Capability</strong></th>
+      <th><strong>Current State</strong></th>
+      <th><strong>Target State (Copado)</strong></th>
+      <th><strong>Change</strong></th>
+      <th><strong>Owner</strong></th>
+    </tr>
+    <tr>
+      <td><strong>CI/CD Orchestration</strong></td>
+      <td>Cloudbees + Jenkins + Jenkinsfile</td>
+      <td>Copado Pipelines + Stages</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Replace</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Build Environment</strong></td>
+      <td>Docker container + SFDX CLI (JWT auth per org)</td>
+      <td>Copado native Salesforce deploy engine (JWT managed)</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Replace</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Delta Identification</strong></td>
+      <td>Salesforce Git Delta (SGD) — identifies changed components per PR</td>
+      <td>Copado native delta detection + SGD as integrated stage</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Enhance</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Shared Pipeline Library</strong></td>
+      <td>Dynamo Shared Library (sfdx-app.yaml)</td>
+      <td>Copado Pipeline Templates (DevX owned)</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Replace</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Image / Artifact Management</strong></td>
+      <td>Artifactory (Docker image versioning)</td>
+      <td>Not required — Copado handles metadata natively</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Retire</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Quality Gates — Apex</strong></td>
+      <td>≥75% code coverage AND 100% test pass rate</td>
+      <td>Same thresholds enforced as Copado Quality Gate stage</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Quality Gates — Jest</strong></td>
+      <td>≥35% overall coverage · ≥70% for Dynamo components</td>
+      <td>Same thresholds enforced as Copado Quality Gate stage</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>E2E / Regression Testing</strong></td>
+      <td>Playwright — ≥80% pass rate threshold</td>
+      <td>Playwright integrated as Copado test stage — same threshold</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Re-integrate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Release Readiness Check</strong></td>
+      <td>Standalone Jenkins feedback pipeline — manually triggered before NFT / Prod. Runs unit, SSAP, Playwright, traceability gates without deploying. PASS/FAIL email per control. UNSTABLE on failure.</td>
+      <td>Copado Pipeline Stage — same parameterized readiness check, managed natively. Feedback auto-sent via Copado notifications.</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Security Scan (SSAP)</strong></td>
+      <td>SSAP — production deployments only</td>
+      <td>SSAP as Copado stage — production only (same scope)</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Re-integrate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Release Branch Management</strong></td>
+      <td>Manual cut at sprint end</td>
+      <td>Copado Release automation at sprint boundary</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Environment Promotion</strong></td>
+      <td>Manual coordination E2E → NFT</td>
+      <td>Gate-based auto-promotion via Copado</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Org Drift Detection</strong></td>
+      <td>Not available</td>
+      <td>Copado org monitoring — continuous drift alerts</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">New</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>JIRA Integration</strong></td>
+      <td>Manual convention — branch name = JIRA ticket #</td>
+      <td>Copado ↔ JIRA bidirectional sync; status auto-updated on deploy</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Automate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>ServiceNow Integration</strong></td>
+      <td>Pipeline auto-creates CR; review + close are manual</td>
+      <td>Copado manages full CR lifecycle natively (create / gate / close)</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Enhance</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Source Control (GitHub)</strong></td>
+      <td>GitHub — 3 repos; 2 approvers required per PR</td>
+      <td>GitHub — maintained; Copado connects natively; 2-approver rule enforced</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Grey</ac:parameter><ac:parameter ac:name="title">No Change</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>SonarQube · JET</strong></td>
+      <td>Integrated via Shared Library + Jenkins; JET IDs linked to commit hashes</td>
+      <td>Re-integrated as Copado Pipeline Stages</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Re-integrate</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+    <tr>
+      <td><strong>Salesforce Orgs / Sandboxes</strong></td>
+      <td>CI · INT · E2E · NFT · PROD (Dev auto-deploys to CI + INT)</td>
+      <td>Same chain, managed by Copado Environment Manager</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Grey</ac:parameter><ac:parameter ac:name="title">No Change</ac:parameter></ac:structured-macro></td>
+      <td>DevX</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 6 — DevX Integration Architecture</h1>
+
+<ac:structured-macro ac:name="info">
+  <ac:parameter ac:name="title">Screenshot Recommended — Insert Visual Diagram Here</ac:parameter>
+  <ac:rich-text-body>
+    <p>The HTML document (<strong>salesforce-sdlc-current-vs-target.html</strong>) contains a hub-and-spoke diagram showing Copado at the centre with all six integrations radiating outward. <strong>Take a screenshot of Section 6 from the HTML file and paste it directly below this panel</strong> — it will render far better than any table-based representation in Confluence.</p>
+    <p><em>Steps: Open the HTML in your browser → scroll to Section 6 → screenshot the hub diagram → paste into this Confluence page below this panel.</em></p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<p>The DevX Automation Team owns and operates the Copado platform. Copado acts as the central hub connecting all tooling into a single governed delivery pipeline.</p>
+
+<table>
+  <colgroup>
+    <col style="width: 15%;" />
+    <col style="width: 15%;" />
+    <col style="width: 40%;" />
+    <col style="width: 15%;" />
+    <col style="width: 15%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th><strong>Integration</strong></th>
+      <th><strong>Type</strong></th>
+      <th><strong>What Copado Does</strong></th>
+      <th><strong>Role</strong></th>
+      <th><strong>DevX Action</strong></th>
+    </tr>
+    <tr>
+      <td><strong>JIRA</strong></td>
+      <td>Native Sync</td>
+      <td>User story ↔ Copado sync · Branch = JIRA ticket # enforced · Status auto-updates on deploy · End-to-end test traceability</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Native Sync</ac:parameter></ac:structured-macro></td>
+      <td>Configures</td>
+    </tr>
+    <tr>
+      <td><strong>ServiceNow</strong></td>
+      <td>Native Sync</td>
+      <td>CR create / update / close · Approval gates the pipeline · Full lifecycle managed without manual steps</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">Native Sync</ac:parameter></ac:structured-macro></td>
+      <td>Configures</td>
+    </tr>
+    <tr>
+      <td><strong>GitHub</strong></td>
+      <td>SCM</td>
+      <td>Repo connection + webhooks · PR / commit metadata · 2 approvers enforced per PR · Branch strategy maintained</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">SCM</ac:parameter></ac:structured-macro></td>
+      <td>Maintains</td>
+    </tr>
+    <tr>
+      <td><strong>SonarQube</strong></td>
+      <td>Quality</td>
+      <td>Static analysis stage · Code coverage upload · Quality gate enforcement on every PR</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Quality</ac:parameter></ac:structured-macro></td>
+      <td>Re-integrates</td>
+    </tr>
+    <tr>
+      <td><strong>JET</strong></td>
+      <td>Evidence</td>
+      <td>Test evidence auto-captured · JET IDs linked to commit hash · Audit traceability per release</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">Evidence</ac:parameter></ac:structured-macro></td>
+      <td>Re-integrates</td>
+    </tr>
+    <tr>
+      <td><strong>SSAP</strong></td>
+      <td>Security</td>
+      <td>Production deployments only · Security scan as pipeline stage · Blocks on vulnerability found</td>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">Security</ac:parameter></ac:structured-macro></td>
+      <td>Re-integrates</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h1>Section 7 — Migration Priority Matrix</h1>
+<p>Where to focus first when planning the Copado migration — prioritised by business impact vs implementation effort.</p>
+
+<table>
+  <colgroup>
+    <col style="width: 50%;" />
+    <col style="width: 50%;" />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th style="text-align: center;"><strong>LOW EFFORT</strong></th>
+      <th style="text-align: center;"><strong>HIGH EFFORT</strong></th>
+    </tr>
+    <tr>
+      <td>
+        <ac:structured-macro ac:name="tip">
+          <ac:parameter ac:name="title">✓ Do First — High Impact, Low Effort</ac:parameter>
+          <ac:rich-text-body>
+            <ul>
+              <li>Automated environment promotion (E2E → NFT → Prod) via Copado gates</li>
+              <li>Org diff / drift detection before every deployment — Copado native</li>
+              <li>SNOW CR approval as a hard pipeline gate — unblocks on approval</li>
+              <li>SNOW CR auto-close on successful deployment</li>
+              <li>Event-driven Contact Centre comms via Copado pipeline events</li>
+              <li>Git tag + email QC report auto-generated on production deploy</li>
+            </ul>
+          </ac:rich-text-body>
+        </ac:structured-macro>
+      </td>
+      <td>
+        <ac:structured-macro ac:name="info">
+          <ac:parameter ac:name="title">→ Strategic — High Impact, Higher Effort</ac:parameter>
+          <ac:rich-text-body>
+            <ul>
+              <li>Copado DX replacing Docker / Jenkins / Dynamo Shared Library — full toolchain migration</li>
+              <li>JIRA ↔ Copado bidirectional User Story sync — DevX integration build</li>
+              <li>Parallel release pipelines — removing the two-sprint release cycle constraint</li>
+              <li>Copado sprint auto-release branch cut — replacing manual step</li>
+              <li>Fast-forward path formalized in Copado as a governed promotion flow</li>
+              <li>Release Readiness Check pipeline migrated as a Copado parameterized stage</li>
+            </ul>
+          </ac:rich-text-body>
+        </ac:structured-macro>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <ac:structured-macro ac:name="note">
+          <ac:parameter ac:name="title">○ Nice to Have — Lower Impact, Low Effort</ac:parameter>
+          <ac:rich-text-body>
+            <ul>
+              <li>Automated JIRA story status update on production deploy</li>
+              <li>Post-deploy step automation via Copado Functions</li>
+              <li>sfdx-app.yaml version update automation — remove remaining infra manual step</li>
+            </ul>
+          </ac:rich-text-body>
+        </ac:structured-macro>
+      </td>
+      <td>
+        <ac:structured-macro ac:name="warning">
+          <ac:parameter ac:name="title">◌ Consider Later — Lower Impact, Higher Effort</ac:parameter>
+          <ac:rich-text-body>
+            <ul>
+              <li>Unified test management replacing JET + JIRA + manual exit reports</li>
+              <li>Full Copado Testing consolidation across Playwright and JET</li>
+              <li>Post-deploy validation steps as versioned Copado Functions with audit trail</li>
+            </ul>
+          </ac:rich-text-body>
+        </ac:structured-macro>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="color: grey; font-size: small;">DYNAMO-V2-SALESFORCE · CURRENT → TARGET SDLC · DEVX PLATFORM TEAM · COPADO MIGRATION · 2026 · FOR LEADERSHIP &amp; MANAGER REVIEW</p>
