@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1100" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="tb" value="" style="fillColor=#003087;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="0" y="0" width="1654" height="78" as="geometry"/>
+    </mxCell>
+    <mxCell id="tt" value="C4 Container Diagram — Agent JWT Role Claimant Enhancement" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="0" y="8" width="1654" height="36" as="geometry"/>
+    </mxCell>
+    <mxCell id="ts" value="DECISION-4860  |  Level 2: Container  |  ICB Authentication Platform" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontColor=#b0c4de;" vertex="1" parent="1">
+      <mxGeometry x="0" y="47" width="1654" height="26" as="geometry"/>
+    </mxCell>
+    <mxCell id="agent" value="&lt;b&gt;Salesforce Agent&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#1e3a8a&quot;&gt;[Person]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#333&quot;&gt;Banking ops agent. Performs case &amp;amp; approval actions in Salesforce.&lt;/font&gt;" style="shape=mxgraph.basic.person2;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#003087;fontColor=#003087;fontSize=11;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="55" y="95" width="150" height="165" as="geometry"/>
+    </mxCell>
+    <mxCell id="ida" value="&lt;b&gt;IDAnywhere SAML IdP&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#555&quot;&gt;[External System | SAML 2.0]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#444&quot;&gt;Provides SAML assertion for agent SSO.&lt;br&gt;⚠ Roles tied to Salesforce SEAL ID&lt;br&gt;— cannot be used in ForgeRock context.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#888888;fontColor=#333333;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;" vertex="1" parent="1">
+      <mxGeometry x="310" y="95" width="215" height="165" as="geometry"/>
+    </mxCell>
+    <mxCell id="sf" value="&lt;b&gt;Salesforce CRM&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#555&quot;&gt;[External System | Salesforce Lightning]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#444&quot;&gt;Agent UI. Authenticates via SAML.&lt;br&gt;Sends internal JWT with &lt;b&gt;chase.role&lt;/b&gt;&lt;br&gt;to ForgeRock on token exchange.&lt;br&gt;&lt;br&gt;Calls Case Manager with:&lt;br&gt;• OBO token (customer / partyKey)&lt;br&gt;• Colleague token (non-customer)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#888888;fontColor=#333333;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;" vertex="1" parent="1">
+      <mxGeometry x="40" y="330" width="195" height="230" as="geometry"/>
+    </mxCell>
+    <mxCell id="bnd" value="ICB Authentication Platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f4ff;strokeColor=#1d4ed8;strokeDasharray=10 5;fontColor=#1d4ed8;fontSize=13;fontStyle=1;verticalAlign=top;arcSize=2;spacingTop=8;spacingLeft=12;align=left;" vertex="1" parent="1">
+      <mxGeometry x="320" y="270" width="980" height="700" as="geometry"/>
+    </mxCell>
+    <mxCell id="fr" value="&lt;b&gt;ICB TMS ForgeRock&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#1e3a8a&quot;&gt;[Container | ForgeRock AM 7.x]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#1e3a8a&quot;&gt;① Receives token exchange + internal JWT from Salesforce.&lt;br&gt;② Validates Salesforce JWT signature.&lt;br&gt;③ Extracts &lt;b&gt;chase.role&lt;/b&gt; claim.&lt;br&gt;④ Issues colleague token with &lt;b&gt;CRM_ROLE&lt;/b&gt; embedded.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#1d4ed8;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;" vertex="1" parent="1">
+      <mxGeometry x="360" y="310" width="285" height="195" as="geometry"/>
+    </mxCell>
+    <mxCell id="cm" value="&lt;b&gt;ICB Case Manager&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#1e3a8a&quot;&gt;[Container | Spring Boot REST API]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#1e3a8a&quot;&gt;① Validates Bearer token (OBO or Colleague).&lt;br&gt;② Extracts &lt;b&gt;CRM_ROLE&lt;/b&gt; from JWT.&lt;br&gt;③ Forwards role to Florence via:&lt;br&gt;&lt;b&gt;Jpmorgan-Authorization-Attribute:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;jpmc.crm.role = CRM_ROLE&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#1d4ed8;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;" vertex="1" parent="1">
+      <mxGeometry x="730" y="540" width="285" height="200" as="geometry"/>
+    </mxCell>
+    <mxCell id="florence" value="&lt;b&gt;Florence Case Manager&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#555&quot;&gt;[External System | Case Platform]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#444&quot;&gt;Enforces RBAC on case/approval actions.&lt;br&gt;Reads &lt;b&gt;Jpmorgan-Authorization-Attribute&lt;/b&gt;.&lt;br&gt;Checks CRM_ROLE against config.&lt;br&gt;No changes needed — existing behaviour.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#888888;fontColor=#333333;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;" vertex="1" parent="1">
+      <mxGeometry x="1360" y="540" width="210" height="200" as="geometry"/>
+    </mxCell>
+    <mxCell id="sec1" value="① AUTH FLOW — Agent role embedded into Colleague Token at ForgeRock" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="325" y="278" width="560" height="26" as="geometry"/>
+    </mxCell>
+    <mxCell id="sec2" value="② REQUEST FLOW — Two paths; both enforce RBAC via role header to Florence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="325" y="510" width="660" height="26" as="geometry"/>
+    </mxCell>
+    <mxCell id="lbl_obo" value="✅  OBO token (customer flow — partyKey present) — role already in OBO token, no change" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#14532d;fontSize=10;fontStyle=0;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="608" width="460" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="lbl_col" value="🆕  Colleague token (non-customer — no partyKey) — role NOW embedded by this change" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#ea580c;fontColor=#7c2d12;fontSize=10;fontStyle=0;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="710" width="460" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="e1" value="Login" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1d4ed8;strokeWidth=1.5;fontColor=#1d4ed8;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="agent" target="sf" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e2" value="SAMLRequest" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#9ca3af;strokeWidth=1.5;fontColor=#6b7280;fontSize=10;dashed=1;dashPattern=6 3;exitX=0.8;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" source="sf" target="ida" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="174" y="270"/>
+          <mxPoint x="270" y="270"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e3" value="SAMLResponse + SAML Token" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#9ca3af;strokeWidth=1.5;fontColor=#6b7280;fontSize=10;dashed=1;dashPattern=6 3;exitX=0;exitY=0.85;exitDx=0;exitDy=0;entryX=0.9;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ida" target="sf" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="270" y="300"/>
+          <mxPoint x="174" y="300"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e4" value="Token exchange + internal JWT (chase.role)  🆕" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#ea580c;strokeWidth=2.5;fontColor=#9a3412;fontSize=10;fontStyle=1;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" source="sf" target="fr" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e5" value="Colleague token + CRM_ROLE claimant  🆕" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#ea580c;strokeWidth=2.5;fontColor=#9a3412;fontSize=10;fontStyle=1;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.6;entryDx=0;entryDy=0;" edge="1" source="fr" target="sf" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e6" value="OBO token + partyKey" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#16a34a;strokeWidth=2.5;fontColor=#14532d;fontSize=10;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="sf" target="cm" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="285" y="480"/>
+          <mxPoint x="285" y="600"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e7" value="Colleague token" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#ea580c;strokeWidth=2.5;fontColor=#9a3412;fontSize=10;fontStyle=1;exitX=1;exitY=0.82;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" source="sf" target="cm" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="285" y="512"/>
+          <mxPoint x="285" y="660"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e8" value="Jpmorgan-Authorization-Attribute: jpmc.crm.role=CRM_ROLE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#2563eb;strokeWidth=2;fontColor=#1e3a8a;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="cm" target="florence" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="lb" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;" vertex="1" parent="1">
+      <mxGeometry x="35" y="840" width="290" height="185" as="geometry"/>
+    </mxCell>
+    <mxCell id="lh" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;fontColor=#111;" vertex="1" parent="1">
+      <mxGeometry x="50" y="848" width="160" height="22" as="geometry"/>
+    </mxCell>
+    <mxCell id="le1" value="" style="endArrow=block;endFill=1;strokeColor=#ea580c;strokeWidth=2.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="878" as="sourcePoint"/>
+        <mxPoint x="105" y="878" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="ll1" value="New / Modified flow (this change)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="871" width="200" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="le2" value="" style="endArrow=block;endFill=1;strokeColor=#16a34a;strokeWidth=2.5;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="904" as="sourcePoint"/>
+        <mxPoint x="105" y="904" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="ll2" value="Existing flow (already working)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="897" width="200" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="le3" value="" style="endArrow=block;endFill=1;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="930" as="sourcePoint"/>
+        <mxPoint x="105" y="930" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="ll3" value="Role forwarded to Florence (header)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="923" width="200" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="le4" value="" style="endArrow=block;endFill=1;strokeColor=#9ca3af;strokeWidth=1.5;dashed=1;dashPattern=6 3;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="50" y="956" as="sourcePoint"/>
+        <mxPoint x="105" y="956" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="ll4" value="SAML authentication flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="949" width="200" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="le5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#888888;fontColor=#333333;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;arcSize=4;" vertex="1" parent="1">
+      <mxGeometry x="50" y="974" width="55" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="ll5" value="External System" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="972" width="200" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="le6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#1d4ed8;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;arcSize=4;spacingTop=5;arcSize=4;" vertex="1" parent="1">
+      <mxGeometry x="50" y="998" width="55" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="ll6" value="ICB Container" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#444;" vertex="1" parent="1">
+      <mxGeometry x="113" y="996" width="200" height="20" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>
