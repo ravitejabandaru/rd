@@ -1,9 +1,10 @@
+I'm going to describe our current Salesforce CI/CD process (CloudBees Jenkins + sfdx + GitHub, pro-code developers only). Summarize it into a short, structured overview a senior engineering audience can absorb in under 2 minutes.
+Structure the output as:
 
-Flow Overview:
+Flow (one line per stage): developer commit → PR → build/validate → deploy, showing which tool does what at each stage
+Environments: the org/branch mapping and promotion path (e.g. feature → int → UAT → prod)
+Quality gates: what's automated (PMD/static analysis, test runs, code coverage, approvals) and where they sit
+Manual steps: anything a human does by hand today
+Known gaps/pain points: max 5 bullets
 
-1. Salesforce retrieves a colleague token via IDAnywhere and ForgeRock using the standard SAML + OBO pattern.
-2. iCB receives the JWT token request from Salesforce.
-3. iCB extracts the role attribute from the request token.
-4. Token is exchanged using Egress Authn/Authz (see DECISION-3983 flow).
-5. iCB stores token in local cache and sends access token to Florence.
-6. Role information is shared with Florence Case Manager (outside the token).
+Keep it under 300 words. No marketing language. If anything I described is ambiguous or missing (e.g. rollback process, hotfix path, how destructive changes are handled), list those as open questions at the end instead of guessing.
